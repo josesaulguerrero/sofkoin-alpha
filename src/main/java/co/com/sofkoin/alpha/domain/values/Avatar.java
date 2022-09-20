@@ -8,7 +8,7 @@ public class Avatar implements ValueObject<String> {
 
   public Avatar(String value) {
     if(!GenericValidator.isUrl(value)) {
-      throw new IllegalArgumentException("Invalid Url Avatar.");
+      throw new IllegalArgumentException("Invalid URL for the avatar.");
     }
 
     this.value = value;

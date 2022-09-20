@@ -3,31 +3,22 @@ package co.com.sofkoin.alpha.domain.values;
 import co.com.sofka.domain.generic.ValueObject;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.util.regex.Pattern;
+import org.apache.commons.validator.GenericValidator;
 
 @EqualsAndHashCode
 @ToString
 public class Phone implements ValueObject<String> {
+    private final String value;
 
-  private static Pattern PHONE_REGEX = Pattern.compile("^\\d{10}$");
-  private String value;
-
-  public Phone(String value) {
-    if(validatePhone(value)) {
-      this.value = value;
-    }
-  }
-
-  public boolean validatePhone(String number) {
-    if(!PHONE_REGEX.matcher(number).find()) {
-      throw new IllegalArgumentException("Invalid Phone(Exactly 10 numbers).");
+    public Phone(String value) {
+        String PHONE_REGEX = "^\\d{10}$";
+        if (!GenericValidator.matchRegexp(value, PHONE_REGEX)) {
+            throw new IllegalArgumentException("Invalid Phone (Must contain exactly 10 numbers).");
+        }
+        this.value = value;
     }
 
-    return true;
-  }
-
-  public String value() {
-    return value;
-  }
+    public String value() {
+        return value;
+    }
 }

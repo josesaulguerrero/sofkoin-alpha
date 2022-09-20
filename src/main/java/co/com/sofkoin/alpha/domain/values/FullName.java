@@ -8,12 +8,12 @@ import java.util.regex.Pattern;
 
 @EqualsAndHashCode
 @ToString
-public class Fullname implements ValueObject<Fullname.Values> {
-  private static Pattern FULLNAME_REGEX = Pattern.compile("[a-zA-Z]{3,}");
+public class FullName implements ValueObject<FullName.Values> {
+  private static final Pattern FULL_NAME_REGEX = Pattern.compile("[a-zA-Z]{3,}");
   private String name;
   private String surname;
 
-  public Fullname(String name, String surname) {
+  public FullName(String name, String surname) {
     if(validateFullName(name, surname)) {
       this.name = name;
       this.surname = surname;
@@ -21,10 +21,15 @@ public class Fullname implements ValueObject<Fullname.Values> {
   }
 
   private static boolean validateFullName(String name, String surname) {
-    if(!FULLNAME_REGEX.matcher(name).find() && !FULLNAME_REGEX.matcher(surname).find()) {
-      throw new IllegalArgumentException("Invalid full name(At least three characters and no numbers).");
+    if(!FULL_NAME_REGEX.matcher(name).find() && !FULL_NAME_REGEX.matcher(surname).find()) {
+      throw new IllegalArgumentException("Invalid full name (Must contain at least three characters and no numbers).");
     }
     return true;
+  }
+
+  public interface Values {
+    String name();
+    String surname();
   }
 
   @Override
@@ -41,11 +46,4 @@ public class Fullname implements ValueObject<Fullname.Values> {
       }
     };
   }
-
-  public interface Values {
-    String name();
-    String surname();
-  }
-
-
 }

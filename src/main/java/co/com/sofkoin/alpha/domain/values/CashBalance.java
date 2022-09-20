@@ -4,7 +4,7 @@ import co.com.sofka.domain.generic.ValueObject;
 import org.apache.commons.validator.GenericValidator;
 
 public class CashBalance implements ValueObject<Double> {
-  private Double value;
+  private final Double value;
 
   public CashBalance(Double value) {
     if(!GenericValidator.minValue(value, 0)) {
