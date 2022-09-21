@@ -1,6 +1,6 @@
 package co.com.sofkoin.alpha.domain.user.values;
 
-public enum Activities {
+public enum ActivityTypes {
     LOGIN,
     LOGOUT,
     PUBLISH_OFFER

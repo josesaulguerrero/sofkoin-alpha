@@ -2,11 +2,11 @@ package co.com.sofkoin.alpha.domain.common.values;
 
 import co.com.sofka.domain.generic.ValueObject;
 
-public class Coin implements ValueObject<Coin.Value> {
+public class Crypto implements ValueObject<Crypto.Value> {
     private final String name;
     private final String symbol;
 
-    public Coin(String name, String symbol) {
+    public Crypto(String name, String symbol) {
         if (!name.isBlank() || !name.trim().isEmpty()) {
             throw new IllegalArgumentException("The given name must not be empty or full of just whitespaces.");
         }
