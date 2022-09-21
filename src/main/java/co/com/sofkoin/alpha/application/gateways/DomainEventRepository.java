@@ -5,6 +5,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface DomainEventRepository {
-    Flux<? extends DomainEvent> findByAggregateRootId(String id);
-    Mono<? extends DomainEvent> saveDomainEvent(DomainEvent event);
+    Flux<DomainEvent> findByAggregateRootId(String id);
+    Mono<DomainEvent> saveDomainEvent(DomainEvent event);
 }
