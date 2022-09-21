@@ -7,10 +7,10 @@ import org.apache.commons.validator.GenericValidator;
 
 @ToString
 @EqualsAndHashCode
-public class TransactionAmount implements ValueObject<Double> {
+public class TransactionCryptoAmount implements ValueObject<Double> {
     private final Double value;
 
-    public TransactionAmount(Double value) {
+    public TransactionCryptoAmount(Double value) {
         if (!GenericValidator.minValue(value, 0.0)) {
             throw new IllegalArgumentException("The Transaction amount must be over 0.");
         }

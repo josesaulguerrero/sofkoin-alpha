@@ -3,10 +3,10 @@ package co.com.sofkoin.alpha.domain.user.values;
 import co.com.sofka.domain.generic.ValueObject;
 import org.apache.commons.validator.GenericValidator;
 
-public class CashBalance implements ValueObject<Double> {
+public class Cash implements ValueObject<Double> {
   private final Double value;
 
-  public CashBalance(Double value) {
+  public Cash(Double value) {
     if(!GenericValidator.minValue(value, 0)) {
       throw new IllegalArgumentException("Invalid Value(Balance must be positive).");
     }
