@@ -1,4 +1,4 @@
-package co.com.sofkoin.alpha.domain.values;
+package co.com.sofkoin.alpha.domain.user.values;
 
 import co.com.sofka.domain.generic.ValueObject;
 import org.apache.commons.validator.GenericValidator;
