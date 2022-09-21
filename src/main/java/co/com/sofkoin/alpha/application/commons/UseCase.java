@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
-public interface UseCase<T extends Command, K extends DomainEvent> extends Function<Mono<T>, CorePublisher<K>> {
-    CorePublisher<K> apply(Mono<T> command);
+public interface UseCase<T extends Command> extends Function<Mono<T>, CorePublisher<? extends DomainEvent>> {
+    CorePublisher<? extends DomainEvent> apply(Mono<T> command);
 }
