@@ -14,5 +14,6 @@ public class CommitP2PTransaction extends Command {
     private String cryptoSymbol;
     private Double cryptoAmount;
     private Double cryptoPrice;
+    private String transactionType;
     private Double cash;
 }

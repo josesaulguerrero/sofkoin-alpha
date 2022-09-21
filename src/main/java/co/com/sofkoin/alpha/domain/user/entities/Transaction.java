@@ -1,7 +1,7 @@
 package co.com.sofkoin.alpha.domain.user.entities;
 
 import co.com.sofka.domain.generic.Entity;
-import co.com.sofkoin.alpha.domain.common.values.Crypto;
+import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.user.values.Timestamp;
 import co.com.sofkoin.alpha.domain.user.values.TransactionCryptoAmount;
 import co.com.sofkoin.alpha.domain.user.values.TransactionCryptoPrice;
@@ -12,31 +12,31 @@ import co.com.sofkoin.alpha.domain.user.values.identities.TransactionID;
 public class Transaction extends Entity<TransactionID> {
     private final Timestamp timestamp;
     
-    private final TransactionTypes transactionTypes;
+    private final TransactionTypes type;
     
     private final TransactionCryptoAmount transactionCryptoAmount;
     
     private final TransactionCryptoPrice transactionCryptoPrice;
     
-    private final Crypto crypto;
+    private final CryptoSymbol cryptoSymbol;
 
     public Transaction(TransactionID entityId, Timestamp timestamp,
-                       TransactionTypes transactionTypes, TransactionCryptoAmount transactionCryptoAmount,
-                       TransactionCryptoPrice transactionCryptoPrice, Crypto crypto) {
+                       TransactionTypes type, TransactionCryptoAmount transactionCryptoAmount,
+                       TransactionCryptoPrice transactionCryptoPrice, CryptoSymbol cryptoSymbol) {
         super(entityId);
         this.timestamp = timestamp;
-        this.transactionTypes = transactionTypes;
+        this.type = type;
         this.transactionCryptoAmount = transactionCryptoAmount;
         this.transactionCryptoPrice = transactionCryptoPrice;
-        this.crypto = crypto;
+        this.cryptoSymbol = cryptoSymbol;
     }
 
     public Timestamp timestamp() {
         return timestamp;
     }
 
-    public TransactionTypes transactionTypes() {
-        return transactionTypes;
+    public TransactionTypes type() {
+        return type;
     }
 
     public TransactionCryptoAmount transactionAmount() {
@@ -47,7 +47,7 @@ public class Transaction extends Entity<TransactionID> {
         return transactionCryptoPrice;
     }
 
-    public Crypto crypto() {
-        return crypto;
+    public CryptoSymbol crypto() {
+        return cryptoSymbol;
     }
 }

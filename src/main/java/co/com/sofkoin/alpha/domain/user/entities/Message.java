@@ -1,12 +1,12 @@
 package co.com.sofkoin.alpha.domain.user.entities;
 
 import co.com.sofka.domain.generic.Entity;
+import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoAmount;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoPrice;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
 import co.com.sofkoin.alpha.domain.user.values.identities.UserID;
-import co.com.sofkoin.alpha.domain.user.values.values.Crypto;
 
 public class Message extends Entity<MessageID> {
     private final ProposalCryptoAmount proposalCryptoAmount;
@@ -14,26 +14,26 @@ public class Message extends Entity<MessageID> {
     private final ProposalCryptoPrice proposalCryptoPrice;
 
     private MessageStatus messageStatus;
-    
+
     private final UserID senderId;
-    
+
     private final UserID receiverId;
-    
-    private final Crypto crypto;
+
+    private final CryptoSymbol cryptoSymbol;
 
     public Message(MessageID entityId, ProposalCryptoAmount proposalCryptoAmount,
                    ProposalCryptoPrice proposalCryptoPrice, MessageStatus messageStatus,
-                   UserID senderId, UserID receiverId, Crypto crypto) {
+                   UserID senderId, UserID receiverId, CryptoSymbol cryptoSymbol) {
         super(entityId);
         this.proposalCryptoAmount = proposalCryptoAmount;
         this.proposalCryptoPrice = proposalCryptoPrice;
         this.messageStatus = messageStatus;
         this.senderId = senderId;
         this.receiverId = receiverId;
-        this.crypto = crypto;
+        this.cryptoSymbol = cryptoSymbol;
     }
 
-    public void changeStatus(MessageStatus messageStatus){
+    public void changeStatus(MessageStatus messageStatus) {
         this.messageStatus = messageStatus;
     }
 
@@ -57,7 +57,7 @@ public class Message extends Entity<MessageID> {
         return receiverId;
     }
 
-    public Crypto crypto() {
-        return crypto;
+    public CryptoSymbol crypto() {
+        return cryptoSymbol;
     }
 }

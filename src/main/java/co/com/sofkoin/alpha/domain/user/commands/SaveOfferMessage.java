@@ -7,7 +7,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendOfferMessage {
+public class SaveOfferMessage {
     private String senderId;
     private String receiverId;
     private String cryptoSymbol;

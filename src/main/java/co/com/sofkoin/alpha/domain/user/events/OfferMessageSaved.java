@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class OfferMessageSent extends DomainEvent {
+public class OfferMessageSaved extends DomainEvent {
     private String messageId;
     private String senderId;
     private String receiverId;
@@ -16,8 +16,8 @@ public class OfferMessageSent extends DomainEvent {
     private Double cryptoAmount;
     private Double cryptoPrice;
 
-    public OfferMessageSent(String messageId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
-        super(OfferMessageSent.class.getName());
+    public OfferMessageSaved(String messageId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
+        super(OfferMessageSaved.class.getName());
         this.messageId = messageId;
         this.senderId = senderId;
         this.receiverId = receiverId;
