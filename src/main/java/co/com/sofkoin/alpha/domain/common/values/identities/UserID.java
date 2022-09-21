@@ -1,4 +1,4 @@
-package co.com.sofkoin.alpha.domain.user.values.identities;
+package co.com.sofkoin.alpha.domain.common.values.identities;
 
 import co.com.sofka.domain.generic.Identity;
 import lombok.EqualsAndHashCode;

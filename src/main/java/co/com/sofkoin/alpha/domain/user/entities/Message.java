@@ -6,7 +6,7 @@ import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoAmount;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoPrice;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
-import co.com.sofkoin.alpha.domain.user.values.identities.UserID;
+import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 
 public class Message extends Entity<MessageID> {
     private final ProposalCryptoAmount proposalCryptoAmount;

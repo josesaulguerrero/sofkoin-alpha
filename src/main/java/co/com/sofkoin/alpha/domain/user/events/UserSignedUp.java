@@ -16,7 +16,15 @@ public class UserSignedUp extends DomainEvent {
     private String avatarUrl;
     private String registerMethod;
 
-    public UserSignedUp(String userId, String email, String password, String name, String surname, String phoneNumber, String avatarUrl, String registerMethod) {
+    public UserSignedUp(String userId,
+                        String email,
+                        String password,
+                        String name,
+                        String surname,
+                        String phoneNumber,
+                        String avatarUrl,
+                        String registerMethod)
+    {
         super(UserSignedUp.class.getName());
         this.userId = userId;
         this.email = email;

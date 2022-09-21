@@ -1,4 +1,4 @@
-package co.com.sofkoin.alpha.domain.user.commands;
+package co.com.sofkoin.alpha.domain.market.commands;
 
 import co.com.sofka.domain.generic.Command;
 import lombok.*;

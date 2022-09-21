@@ -1,4 +1,4 @@
-package co.com.sofkoin.alpha.domain.user.commands;
+package co.com.sofkoin.alpha.domain.market.commands;
 
 import co.com.sofka.domain.generic.Command;
 import lombok.*;
@@ -11,6 +11,6 @@ import lombok.*;
 public class PublishP2POffer extends Command {
     private String publisherId;
     private String targetAudienceId;
-    private Double cryptoAmount;
-    private Double cryptoPrice;
+    private Double offerCryptoAmount;
+    private Double offerCryptoPrice;
 }

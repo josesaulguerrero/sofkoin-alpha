@@ -10,14 +10,14 @@ import co.com.sofkoin.alpha.domain.user.values.*;
 import co.com.sofkoin.alpha.domain.user.values.identities.ActivityID;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
 import co.com.sofkoin.alpha.domain.user.values.identities.TransactionID;
-import co.com.sofkoin.alpha.domain.user.values.identities.UserID;
-
+import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 
 public class UserEventListener extends EventChange {
     public UserEventListener(User user) {
+
         super.apply((UserSignedUp event) -> {
             user.fullName = new FullName(event.getName(), event.getSurname());
             user.password = new Password(event.getPassword());
@@ -113,7 +113,8 @@ public class UserEventListener extends EventChange {
                         .stream()
                         .filter(c -> Objects.equals(c.value().coinSymbol(), event.getCryptoSymbol()))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("The user does not have any coins with the specified name; You cannot sell coins you do not possess."));
+                        .orElseThrow(() -> new IllegalArgumentException("The user does not have any coins with the " +
+                                "specified name; You cannot sell coins you do not possess."));
                 CryptoBalance newCryptoBalance = new CryptoBalance(
                         currentCryptoBalance.value().amount() - event.getCryptoAmount(),
                         currentCryptoBalance.value().coinSymbol()

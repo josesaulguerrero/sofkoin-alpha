@@ -10,7 +10,7 @@ import co.com.sofkoin.alpha.domain.user.events.*;
 import co.com.sofkoin.alpha.domain.user.values.*;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
 import co.com.sofkoin.alpha.domain.user.values.identities.TransactionID;
-import co.com.sofkoin.alpha.domain.user.values.identities.UserID;
+import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -33,7 +33,14 @@ public class User extends AggregateEvent<UserID> {
     protected Set<Transaction> transactions;
     protected Set<Message> messages;
 
-    public User(UserID entityId, FullName fullName, Password password, Email email, Phone phone, Avatar avatar, RegisterMethod registerMethod) {
+    public User(UserID entityId,
+                FullName fullName,
+                Password password,
+                Email email,
+                Phone phone,
+                Avatar avatar,
+                RegisterMethod registerMethod)
+    {
         super(entityId);
         super
                 .appendChange(
