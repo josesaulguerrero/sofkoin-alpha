@@ -34,8 +34,8 @@ public class SpringSecurityConfiguration {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeExchange()
-                .pathMatchers("/auth/login", "auth/signup").permitAll()
-                .pathMatchers("/auth/logout").authenticated()
+                .pathMatchers("/auth/login", "/auth/signup").permitAll()
+                .pathMatchers("/auth/logout", "/transaction/**").authenticated()
                 .and()
                 .addFilterAt(new JWTAuthenticationFilter(JWTProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
