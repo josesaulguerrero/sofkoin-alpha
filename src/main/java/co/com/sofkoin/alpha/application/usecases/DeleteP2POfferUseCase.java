@@ -9,10 +9,9 @@ import co.com.sofkoin.alpha.domain.market.entities.root.Market;
 import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
-import reactor.core.CorePublisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Log4j2
@@ -24,7 +23,7 @@ public class DeleteP2POfferUseCase implements UseCase<DeleteP2POffer> {
     DomainEventRepository domainEventRepository;
 
     @Override
-    public CorePublisher<? extends DomainEvent> apply(Mono<DeleteP2POffer> deleteP2POfferCommand) {
+    public Flux<DomainEvent> apply(Mono<DeleteP2POffer> deleteP2POfferCommand) {
         return deleteP2POfferCommand.flatMapMany(command -> domainEventRepository.findByAggregateRootId(command.getMarketId())
                 .collectList()
                 .flatMapIterable(events -> {

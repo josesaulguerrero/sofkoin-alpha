@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateMarket extends Command {
-    private String marketId;
+
     private String country;
+
 }

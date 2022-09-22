@@ -13,10 +13,8 @@ import co.com.sofkoin.alpha.domain.market.values.OfferCryptoPrice;
 import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
-import reactor.core.CorePublisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,12 +26,12 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
     DomainEventBus domainEventBus;
     DomainEventRepository domainEventRepository;
     @Override
-    public CorePublisher<? extends DomainEvent> apply(Mono<PublishP2POffer> publishP2POfferCommand) {
+    public Flux<DomainEvent> apply(Mono<PublishP2POffer> publishP2POfferCommand) {
         return publishP2POfferCommand.flatMapMany(command -> domainEventRepository.findByAggregateRootId(command.getMarketId())
                 .collectList()
                 .flatMapIterable(events -> {
                     Market market = Market.from(new MarketID(command.getMarketId()),events);
-                    market.publishP2POffer(new OfferId(command.getOfferId()), new UserID(command.getPublisherId()),
+                    market.publishP2POffer(new OfferId(), new UserID(command.getPublisherId()),
                             new CryptoSymbol(command.getCryptoSymbol()), new OfferCryptoAmount(command.getOfferCryptoAmount()),
                             new OfferCryptoPrice(command.getOfferCryptoPrice()), new UserID(command.getTargetAudienceId()));
                     return market.getUncommittedChanges();
