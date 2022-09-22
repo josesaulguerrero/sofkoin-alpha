@@ -1,4 +1,4 @@
-package co.com.sofkoin.alpha.infrastructure.adapters;
+package co.com.sofkoin.alpha.infrastructure.adapters.bcrypt;
 
 import co.com.sofkoin.alpha.application.gateways.PasswordEncoder;
 import lombok.AllArgsConstructor;
