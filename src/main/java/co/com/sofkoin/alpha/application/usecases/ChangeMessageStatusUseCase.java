@@ -4,10 +4,8 @@ import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.application.commons.UseCase;
 import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
-import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import co.com.sofkoin.alpha.domain.user.commands.ChangeMessageStatus;
-import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
@@ -51,10 +49,9 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus>{
                             MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim())
                     );
                     return user.getUncommittedChanges();
-                }).map(event -> {
+                }).flatMap(event -> {
                     bus.publishEvent(event);
-                    repository.saveDomainEvent(event);
-                    return event;
+                    return repository.saveDomainEvent(event).thenReturn(event);
                 });
     }
 

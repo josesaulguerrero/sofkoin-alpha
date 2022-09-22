@@ -42,28 +42,28 @@ class SaveOfferMessageUseCaseTest {
 
         var receiverSignedUp = new UserSignedUp(command.getReceiverId(),
                 "stephany@email.com",
-                "stephany@email.com",
+                "Test123ABC",
                 "Stephany",
                 "Yepes",
                 "3108509630",
                 "https://www.freepik.es/psd-gratis/ilustracion-27470311",
-                RegisterMethod.GMAIL.name()
+                RegisterMethod.MANUAL.name()
         );
 
         var senderSignedUp = new UserSignedUp(command.getSenderId(),
                 "katerin@email.com",
-                "katerin@email.com",
+                "Test789ABC",
                 "Katerin",
                 "Calderón",
                 "3108512397",
                 "https://www.freepik.es/psd-gratis/ilustracion-27470375",
-                RegisterMethod.GMAIL.name()
+                RegisterMethod.MANUAL.name()
         );
 
-        BDDMockito.when(repositoryMock.findByAggregateRootId(Mockito.any(String.class)))
+        BDDMockito.when(repositoryMock.findByAggregateRootId(command.getReceiverId()))
                 .thenReturn(Flux.just(receiverSignedUp));
 
-        BDDMockito.when(repositoryMock.findByAggregateRootId(Mockito.any(String.class)))
+        BDDMockito.when(repositoryMock.findByAggregateRootId(command.getSenderId()))
                 .thenReturn(Flux.just(senderSignedUp));
 
         BDDMockito.when(repositoryMock.saveDomainEvent(Mockito.any(DomainEvent.class)))
@@ -74,8 +74,8 @@ class SaveOfferMessageUseCaseTest {
         StepVerifier.create(useCase)
                 .expectSubscription()
                 .expectNextMatches(events -> events instanceof OfferMessageSaved)
-                .expectComplete()
-                .verify();
+                .expectNextMatches(events -> events instanceof OfferMessageSaved)
+                .verifyComplete();
 
         BDDMockito.verify(eventBus, BDDMockito.times(2))
                 .publishEvent(Mockito.any(DomainEvent.class));

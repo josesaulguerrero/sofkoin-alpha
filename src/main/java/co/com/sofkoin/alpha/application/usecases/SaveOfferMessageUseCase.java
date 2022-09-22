@@ -31,7 +31,6 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
                 .flatMapMany(command -> applyCommandToUserById(command, command.getReceiverId(), messageId));
         Flux<DomainEvent> senderFLux = saveOfferMessageCommand
                 .flatMapMany(command -> applyCommandToUserById(command, command.getSenderId(), messageId));
-
         return Flux.merge(receiverFLux, senderFLux);
     }
 
@@ -49,10 +48,9 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
                             new TransactionCryptoAmount(command.getCryptoAmount()),
                             new TransactionCryptoPrice(command.getCryptoPrice()));
                     return user.getUncommittedChanges();
-                }).map(event -> {
+                }).flatMap(event -> {
                     bus.publishEvent(event);
-                    repository.saveDomainEvent(event);
-                    return event;
+                    return repository.saveDomainEvent(event).thenReturn(event);
                 });
     }
 
