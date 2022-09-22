@@ -12,7 +12,6 @@ public class Password implements ValueObject<String> {
 
     public Password(String value) {
         String PASSWORD_REGEX = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$";
-        System.out.println("value = " + value);
         if (!GenericValidator.isEmail(value) && !GenericValidator.matchRegexp(value, PASSWORD_REGEX)) {
             throw new IllegalArgumentException("Invalid Password (At least eight characters, one number, one lowercase and one uppercase).");
         }
