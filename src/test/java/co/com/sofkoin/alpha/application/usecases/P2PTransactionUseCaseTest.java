@@ -118,7 +118,7 @@ class P2PTransactionUseCaseTest {
                 new Timestamp().toString()
         );
 
-       BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
+        BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
                 .thenReturn(Flux.just(buyeruser,
                         walletfundedbuyer
                 ));
@@ -138,12 +138,8 @@ class P2PTransactionUseCaseTest {
 
         StepVerifier.create(triggeredevents)
                 .expectSubscription()
-                .expectNextMatches(domainEvents ->
-
-                        domainEvents instanceof P2PTransactionCommitted)
-                .expectNextMatches(domainEvents ->
-
-                        domainEvents instanceof P2PTransactionCommitted)
+                .expectNextMatches(domainEvents -> domainEvents instanceof P2PTransactionCommitted)
+                .expectNextMatches(domainEvents -> domainEvents instanceof P2PTransactionCommitted)
                 .verifyComplete();
 
         BDDMockito.verify(this.domainEventRepository, BDDMockito.times(2))

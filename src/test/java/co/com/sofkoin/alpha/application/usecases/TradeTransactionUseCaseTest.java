@@ -21,7 +21,7 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class TradeTransactionuseCaseTest {
+class TradeTransactionUseCaseTest {
     @Mock
     private DomainEventRepository eventBus;
     @Mock
@@ -31,7 +31,7 @@ class TradeTransactionuseCaseTest {
     private TradeTransactionuseCase useCase;
 
     @Test
-    void tradeTransactionuseCase() {
+    void tradeTransactionUseCase() {
 
         CommitTradeTransaction command = new CommitTradeTransaction(
                 "1",
@@ -63,34 +63,29 @@ class TradeTransactionuseCaseTest {
                 "GMAIL"
         );
 
-        var walletfunded = new WalletFunded(
+        var walletFunded = new WalletFunded(
                 "1",
                 100.0,
                 new Timestamp().toString()
-                );
+        );
 
-       BDDMockito.when(this.domainEventRepository.findByAggregateRootId(BDDMockito.anyString()))
-                .thenReturn(Flux.just(user
-                        ,walletfunded
-                ));
+        BDDMockito.when(this.domainEventRepository.findByAggregateRootId(BDDMockito.anyString()))
+                .thenReturn(Flux.just(user, walletFunded));
 
         BDDMockito
                 .when(this.domainEventRepository.saveDomainEvent(ArgumentMatchers.any(DomainEvent.class)))
                 .thenReturn(Mono.just(event));
 
 
-        Mono<List<DomainEvent>> triggeredevents = this.useCase.apply(Mono.just(command))
+        Mono<List<DomainEvent>> triggeredEvents = this.useCase.apply(Mono.just(command))
                 .collectList();
 
-        StepVerifier.create(triggeredevents)
+        StepVerifier.create(triggeredEvents)
                 .expectSubscription()
                 .expectNextMatches(domainEvents ->
-                        domainEvents.size() == 1 &&
-                        domainEvents.get(0) instanceof TradeTransactionCommitted)
+                        domainEvents.size() == 1 && domainEvents.get(0) instanceof TradeTransactionCommitted
+                )
                 .verifyComplete();
-
-    //    BDDMockito.verify(this.eventBus, BDDMockito.times(1))
-    //            .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
 
         BDDMockito.verify(this.domainEventRepository, BDDMockito.times(1))
                 .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
