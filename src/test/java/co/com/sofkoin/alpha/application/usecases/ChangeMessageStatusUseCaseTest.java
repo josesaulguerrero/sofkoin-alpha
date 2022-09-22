@@ -79,6 +79,7 @@ class ChangeMessageStatusUseCaseTest {
         StepVerifier.create(useCase)
                 .expectSubscription()
                 .expectNextMatches(events -> events instanceof MessageStatusChanged)
+                .expectNextMatches(events -> events instanceof MessageStatusChanged)
                 .verifyComplete();
 
         BDDMockito.verify(eventBus, BDDMockito.times(2))

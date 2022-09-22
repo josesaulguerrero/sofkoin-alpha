@@ -142,7 +142,7 @@ public class UserEventListener extends EventChange {
 
         super.apply((OfferMessageSaved event) -> {
             Message message = new Message(
-                    new MessageID(),
+                    new MessageID(event.getMessageId()),
                     new ProposalCryptoAmount(event.getCryptoAmount()),
                     new ProposalCryptoPrice(event.getCryptoPrice()),
                     MessageStatus.PENDING,
