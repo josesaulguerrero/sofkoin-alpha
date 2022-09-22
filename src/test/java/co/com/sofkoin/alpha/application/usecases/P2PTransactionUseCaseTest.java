@@ -11,6 +11,7 @@ import co.com.sofkoin.alpha.domain.user.events.WalletFunded;
 import co.com.sofkoin.alpha.domain.user.values.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -117,7 +118,7 @@ class P2PTransactionUseCaseTest {
                 new Timestamp().toString()
         );
 
-        BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
+       BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
                 .thenReturn(Flux.just(buyeruser,
                         walletfundedbuyer
                 ));
@@ -129,18 +130,20 @@ class P2PTransactionUseCaseTest {
                 ));
 
         BDDMockito
-                .when(this.domainEventRepository.saveDomainEvent((ArgumentMatchers.any(P2PTransactionCommitted.class))))
-                .thenReturn(Mono.just(eventseller));
+                .when(this.domainEventRepository.saveDomainEvent((ArgumentMatchers.any(DomainEvent.class))))
+                .then(i -> Mono.just(i.getArgument(0)));
 
-        BDDMockito
-                .when(this.domainEventRepository.saveDomainEvent((ArgumentMatchers.any(P2PTransactionCommitted.class))))
-                .thenReturn(Mono.just(eventbuyer));
+      /*  BDDMockito.doAnswer(AdditionalAnswers.returnsArgAt(0)).when(this.domainEventRepository)
+                .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
+*/
 
-        Mono<List<DomainEvent>> triggeredevents = this.useCase.apply(Mono.just(command))
-                .collectList();
+        Flux<DomainEvent> triggeredevents = this.useCase.apply(Mono.just(command));
 
         StepVerifier.create(triggeredevents)
                 .expectSubscription()
+                .expectNextMatches(domainEvents ->
+
+                        domainEvents instanceof P2PTransactionCommitted)
                 .expectNextMatches(domainEvents ->
 
                         domainEvents instanceof P2PTransactionCommitted)

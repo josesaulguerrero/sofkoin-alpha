@@ -44,7 +44,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
     public Flux<DomainEvent> P2PTransaction(Mono<CommitP2PTransaction> P2Ptransactioncommand, String userId, TransactionTypes transactionType) {
 
     return P2Ptransactioncommand.flatMapMany(command ->
-            repository.findByAggregateRootId(command.getSellerId())
+            repository.findByAggregateRootId(userId)
                     .collectList()
                     .flatMapIterable(events ->{
                         User seller = User.from(new UserID(userId), events);
@@ -58,7 +58,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                                 new Cash(command.getCash()),
                                 new Timestamp());
 
-                        log.info(transactionType.name() + " transaction running for User: " + userId);
+                        log.info(transactionType.name() + " transaction running for User: " + seller);
 
                         return seller.getUncommittedChanges();
                     }).map(domainEvent -> {
