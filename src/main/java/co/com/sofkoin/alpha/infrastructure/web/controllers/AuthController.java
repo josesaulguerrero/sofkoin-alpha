@@ -1,6 +1,7 @@
 package co.com.sofkoin.alpha.infrastructure.web.controllers;
 
 import co.com.sofka.domain.generic.DomainEvent;
+import co.com.sofkoin.alpha.application.usecases.LogInUseCase;
 import co.com.sofkoin.alpha.application.usecases.SignUpUseCase;
 import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.commands.SignUp;
@@ -18,11 +19,11 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("auth")
 @AllArgsConstructor
+@RequestMapping("auth")
 public class AuthController {
     private SignUpUseCase signUpUseCase;
-    // private LogInUseCase loginUseCase;
+    private LogInUseCase loginUseCase;
 
     @PostMapping("signup")
     @PreAuthorize("permitAll()")
@@ -33,12 +34,12 @@ public class AuthController {
         );
     }
 
-//    @PostMapping("login")
-//    @PreAuthorize("permitAll()")
-//    public ResponseEntity<Flux<DomainEvent>> logIn(@RequestBody @Valid LogIn body) {
-//        return new ResponseEntity<>(
-//                this.logInUseCase.apply(Mono.just(body)),
-//                HttpStatus.OK
-//        );
-//    }
+    @PostMapping("login")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Flux<DomainEvent>> logIn(@RequestBody @Valid LogIn body) {
+        return new ResponseEntity<>(
+                this.loginUseCase.apply(Mono.just(body)),
+                HttpStatus.OK
+        );
+    }
 }

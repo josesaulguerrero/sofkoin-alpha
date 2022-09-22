@@ -18,7 +18,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 @Component
 @Log4j2
-
 @AllArgsConstructor
 public class CreateMarketUseCase implements UseCase<CreateMarket> {
 
