@@ -50,13 +50,16 @@ public class SpringSecurityConfiguration {
   @Bean
   public ReactiveUserDetailsService userDetailsService(DomainEventRepository userRepository) {
     return
-      rootID ->
+      email ->
         userRepository
-          .findByAggregateRootId(rootID)
+          .findDomainEventsByEmail(email)
           .collectList()
           .map(events -> {
+
             var user = co.com.sofkoin.alpha.domain
-                    .user.entities.root.User.from(new UserID(rootID), events);
+                    .user.entities.root.User.from(
+                            new UserID(events.get(0).aggregateRootId()),
+                            events);
 
             return
                 User

@@ -8,7 +8,6 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
-import co.com.sofkoin.alpha.domain.user.events.UserLoggedIn;
 import co.com.sofkoin.alpha.domain.user.values.Email;
 import co.com.sofkoin.alpha.domain.user.values.Password;
 import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
@@ -39,18 +38,20 @@ public class LogInUseCase implements UseCase<LogIn> {
       command
       .flatMap(com ->
               authenticationManager
-              .authenticate(new UsernamePasswordAuthenticationToken(com.getUserId(), com.getPassword()))
+              .authenticate(new UsernamePasswordAuthenticationToken(com.getEmail(), com.getPassword()))
               .onErrorMap(BadCredentialsException.class, err -> new Throwable(HttpStatus.FORBIDDEN.toString()))
               .map(tokenProvider::createJwtToken)
               .flatMap(token ->
                       domainEventRepository
-                      .findByAggregateRootId(com.getUserId())
+                      .findDomainEventsByEmail(com.getEmail())
                       .collectList()
                       .map(events -> {
-                        User user = User.from(new UserID(com.getUserId()), events);
+                        User user = User.from(new UserID(
+                                events.get(0).aggregateRootId()),
+                                events);
 
                         user.logIn(
-                                new UserID(com.getUserId()),
+                                new UserID(user.identity().value()),
                                 new Email(com.getEmail()),
                                 new Password(com.getPassword()),
                                 RegisterMethod.valueOf(com.getLoginMethod().toUpperCase(Locale.ROOT).trim()),

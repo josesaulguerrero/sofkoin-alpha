@@ -44,14 +44,13 @@ class LogInUseCaseTest {
     final String JWT_TOKEN = "7373277213";
 
     LogIn command = new LogIn(
-            "2838128321",
             "someone@gmail.com",
             "my_strong_PASSWORD_12345",
             RegisterMethod.MANUAL.name()
     );
 
     UserSignedUp evSignedUp = new UserSignedUp(
-            command.getUserId(),
+            "7237127321",
             command.getEmail(),
             command.getPassword(),
             "David",
@@ -61,8 +60,10 @@ class LogInUseCaseTest {
             command.getLoginMethod()
     );
 
+    evSignedUp.setAggregateRootId("7237127321");
+
     UserLoggedIn evLogIn = new UserLoggedIn(
-            command.getUserId(),
+            evSignedUp.getUserId(),
             command.getEmail(),
             command.getPassword(),
             command.getLoginMethod(),
@@ -76,7 +77,7 @@ class LogInUseCaseTest {
       .thenReturn(Mono.just(evLogIn));
 
     BDDMockito
-      .when(domainEventRepository.findByAggregateRootId(BDDMockito.anyString()))
+      .when(domainEventRepository.findDomainEventsByEmail(BDDMockito.anyString()))
       .thenReturn(Flux.just(evSignedUp));
 
     BDDMockito
@@ -112,7 +113,7 @@ class LogInUseCaseTest {
       .saveDomainEvent(BDDMockito.any(DomainEvent.class));
     BDDMockito
       .verify(domainEventRepository, BDDMockito.times(1))
-      .findByAggregateRootId(BDDMockito.anyString());
+      .findDomainEventsByEmail(BDDMockito.anyString());
     BDDMockito
       .verify(domainEventBus, BDDMockito.times(1))
       .publishEvent(BDDMockito.any(DomainEvent.class));

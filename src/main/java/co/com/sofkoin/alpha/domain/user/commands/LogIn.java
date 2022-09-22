@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogIn extends Command {
-    private String userId;
     private String email;
     private String password;
     private String loginMethod;
