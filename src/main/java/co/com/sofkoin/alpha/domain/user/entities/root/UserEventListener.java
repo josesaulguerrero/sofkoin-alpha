@@ -35,15 +35,16 @@ public class UserEventListener extends EventChange {
         });
 
         super.apply((MessageStatusChanged event) -> {
-            Message message = user.messages
+            Message messageToChange = user.messages
                     .stream()
-                    .filter(m -> Objects.equals(m.identity().value(), event.getMessageId()))
+                    .filter(message -> message.identity().equals(new MessageID(event.getMessageId())))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("The given id does not belong to any of the user messages."));
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("The given id does not belong to any of the user messages."));
             MessageStatus newStatus = MessageStatus.valueOf(
                     event.getNewStatus().toUpperCase(Locale.ROOT).trim()
             );
-            message.changeStatus(newStatus);
+            messageToChange.changeStatus(newStatus);
         });
 
         super.apply((P2PTransactionCommitted event) -> {
@@ -141,7 +142,7 @@ public class UserEventListener extends EventChange {
 
         super.apply((OfferMessageSaved event) -> {
             Message message = new Message(
-                    new MessageID(),
+                    new MessageID(event.getMessageId()),
                     new ProposalCryptoAmount(event.getCryptoAmount()),
                     new ProposalCryptoPrice(event.getCryptoPrice()),
                     MessageStatus.PENDING,
