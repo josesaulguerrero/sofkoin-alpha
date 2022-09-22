@@ -6,7 +6,7 @@ public class CryptoSymbol implements ValueObject<String> {
     private final String value;
 
     public CryptoSymbol(String value) {
-        if (!value.isBlank() || !value.trim().isEmpty()) {
+        if (value.isBlank() || value.trim().isEmpty()) {
             throw new IllegalArgumentException("The given symbol must not be empty or full of just whitespaces.");
         }
         this.value = value;
