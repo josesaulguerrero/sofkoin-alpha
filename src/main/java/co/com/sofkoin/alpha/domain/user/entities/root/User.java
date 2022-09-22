@@ -69,12 +69,14 @@ public class User extends AggregateEvent<UserID> {
         return user;
     }
 
-    public void changeMessageStatus(MessageID messageId, MessageStatus status) {
+    public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
         super
                 .appendChange(
                         new MessageStatusChanged(
+                                receiverId.value(),
+                                senderId.value(),
                                 messageId.value(),
-                                status.name()
+                                newStatus.name()
                         )
                 )
                 .apply();
@@ -148,7 +150,13 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void saveOfferMessage(MessageID messageId, UserID senderId, UserID receiverId, CryptoSymbol cryptoSymbol, TransactionCryptoAmount cryptoAmount, TransactionCryptoPrice cryptoPrice) {
+    public void saveOfferMessage(MessageID messageId,
+                                 UserID senderId,
+                                 UserID receiverId,
+                                 CryptoSymbol cryptoSymbol,
+                                 TransactionCryptoAmount cryptoAmount,
+                                 TransactionCryptoPrice cryptoPrice
+    ) {
         super
                 .appendChange(
                         new OfferMessageSaved(

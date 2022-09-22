@@ -1,5 +1,6 @@
 package co.com.sofkoin.alpha.domain.user.commands;
 
+import co.com.sofka.domain.generic.Command;
 import lombok.*;
 
 @Getter
@@ -7,7 +8,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveOfferMessage {
+public class SaveOfferMessage extends Command {
     private String senderId;
     private String receiverId;
     private String cryptoSymbol;
