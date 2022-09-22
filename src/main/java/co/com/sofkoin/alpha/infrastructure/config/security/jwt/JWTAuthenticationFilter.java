@@ -13,13 +13,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-public class JwtTokenAuthenticationFilter implements WebFilter {
+public class JWTAuthenticationFilter implements WebFilter {
   public static final String TOKEN_PREFIX = "Bearer ";
 
-  private final JwtTokenProvider jwtTokenProvider;
+  private final JWTProvider JWTProvider;
 
-  public JwtTokenAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
-    this.jwtTokenProvider = jwtTokenProvider;
+  public JWTAuthenticationFilter(JWTProvider JWTProvider) {
+    this.JWTProvider = JWTProvider;
   }
 
   @Override
@@ -28,15 +28,15 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
 
     if(!StringUtils.hasText(token)) return chain.filter(exchange);
 
-    Map<String, Object> claimsFromToken = JwtTokenProvider.getClaimsFromToken(token);
+    Map<String, Object> claimsFromToken = JWTProvider.getClaimsFromToken(token);
 
     if(claimsFromToken.isEmpty()) return chain.filter(exchange);
 
-    boolean isValid = jwtTokenProvider.validateToken((Claims) claimsFromToken);
+    boolean isValid = JWTProvider.validateToken((Claims) claimsFromToken);
 
     if(!isValid) return chain.filter(exchange);
 
-    Authentication authentication = jwtTokenProvider.getAuthentication((Claims) claimsFromToken);
+    Authentication authentication = JWTProvider.getAuthentication((Claims) claimsFromToken);
 
     return
       chain.filter(exchange)

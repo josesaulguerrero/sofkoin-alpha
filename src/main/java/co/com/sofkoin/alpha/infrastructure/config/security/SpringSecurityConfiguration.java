@@ -2,8 +2,8 @@ package co.com.sofkoin.alpha.infrastructure.config.security;
 
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
-import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JwtTokenAuthenticationFilter;
-import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JwtTokenProvider;
+import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTAuthenticationFilter;
+import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -23,7 +23,7 @@ public class SpringSecurityConfiguration {
   @Bean
   public SecurityWebFilterChain getWebFilterChain(
           ServerHttpSecurity http,
-          JwtTokenProvider jwtTokenProvider
+          JWTProvider JWTProvider
   ) {
     return http
             .cors().disable()
@@ -32,7 +32,7 @@ public class SpringSecurityConfiguration {
             .httpBasic().disable()
             .authorizeExchange()
             .and()
-            .addFilterAt(new JwtTokenAuthenticationFilter(jwtTokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
+            .addFilterAt(new JWTAuthenticationFilter(JWTProvider), SecurityWebFiltersOrder.HTTP_BASIC)
             .build();
   }
 
@@ -52,7 +52,7 @@ public class SpringSecurityConfiguration {
     return
       email ->
         userRepository
-          .findDomainEventsByEmail(email)
+          .findUserDomainEventsByEmail(email)
           .collectList()
           .map(events -> {
 

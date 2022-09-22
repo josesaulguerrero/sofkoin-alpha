@@ -11,7 +11,7 @@ import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.values.Email;
 import co.com.sofkoin.alpha.domain.user.values.Password;
 import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
-import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JwtTokenProvider;
+import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,7 +29,7 @@ public class LogInUseCase implements UseCase<LogIn> {
 
   private final DomainEventRepository domainEventRepository;
   private final DomainEventBus domainEventBus;
-  private final JwtTokenProvider tokenProvider;
+  private final JWTProvider tokenProvider;
   private final ReactiveAuthenticationManager authenticationManager;
 
   @Override
@@ -43,7 +43,7 @@ public class LogInUseCase implements UseCase<LogIn> {
               .map(tokenProvider::createJwtToken)
               .flatMap(token ->
                       domainEventRepository
-                      .findDomainEventsByEmail(com.getEmail())
+                      .findUserDomainEventsByEmail(com.getEmail())
                       .collectList()
                       .map(events -> {
                         User user = User.from(new UserID(

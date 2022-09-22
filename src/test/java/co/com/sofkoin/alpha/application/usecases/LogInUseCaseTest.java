@@ -7,7 +7,7 @@ import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.events.UserLoggedIn;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
-import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JwtTokenProvider;
+import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -33,7 +33,7 @@ class LogInUseCaseTest {
   @Mock
   private DomainEventBus domainEventBus;
   @Mock
-  private JwtTokenProvider tokenProvider;
+  private JWTProvider tokenProvider;
   @Mock
   private ReactiveAuthenticationManager authenticationManager;
   @InjectMocks
@@ -77,7 +77,7 @@ class LogInUseCaseTest {
       .thenReturn(Mono.just(evLogIn));
 
     BDDMockito
-      .when(domainEventRepository.findDomainEventsByEmail(BDDMockito.anyString()))
+      .when(domainEventRepository.findUserDomainEventsByEmail(BDDMockito.anyString()))
       .thenReturn(Flux.just(evSignedUp));
 
     BDDMockito
@@ -113,7 +113,7 @@ class LogInUseCaseTest {
       .saveDomainEvent(BDDMockito.any(DomainEvent.class));
     BDDMockito
       .verify(domainEventRepository, BDDMockito.times(1))
-      .findDomainEventsByEmail(BDDMockito.anyString());
+      .findUserDomainEventsByEmail(BDDMockito.anyString());
     BDDMockito
       .verify(domainEventBus, BDDMockito.times(1))
       .publishEvent(BDDMockito.any(DomainEvent.class));
