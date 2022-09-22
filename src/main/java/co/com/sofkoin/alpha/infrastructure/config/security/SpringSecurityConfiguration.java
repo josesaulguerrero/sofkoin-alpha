@@ -18,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-import java.util.Collection;
 import java.util.Collections;
 
 @Configuration
@@ -35,7 +34,8 @@ public class SpringSecurityConfiguration {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeExchange()
-                .pathMatchers("/auth/**").permitAll()
+                .pathMatchers("/auth/login", "auth/signup").permitAll()
+                .pathMatchers("/auth/logout").authenticated()
                 .and()
                 .addFilterAt(new JWTAuthenticationFilter(JWTProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
