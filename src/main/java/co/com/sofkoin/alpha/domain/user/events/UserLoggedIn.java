@@ -15,6 +15,10 @@ public class UserLoggedIn extends DomainEvent {
     private String loginMethod;
     private String jwt;
 
+    public UserLoggedIn() {
+        super(UserLoggedIn.class.getName());
+    }
+
     public UserLoggedIn(String userId, String email, String password, String loginMethod, String jwt) {
         super(UserLoggedIn.class.getName());
         this.userId = userId;

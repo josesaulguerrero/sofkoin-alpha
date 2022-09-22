@@ -15,6 +15,10 @@ public class MessageStatusChanged extends DomainEvent {
     private String messageId;
     private String newStatus;
 
+    public MessageStatusChanged() {
+        super(MessageStatusChanged.class.getName());
+    }
+
     public MessageStatusChanged(String receiverId, String senderId,String messageId, String newStatus) {
         super(MessageStatusChanged.class.getName());
         this.receiverId = receiverId;

@@ -11,6 +11,10 @@ import lombok.ToString;
 public class UserLoggedOut extends DomainEvent {
     private String userId;
 
+    public UserLoggedOut() {
+        super(UserLoggedOut.class.getName());
+    }
+
     public UserLoggedOut(String userId) {
         super(UserLoggedOut.class.getName());
         this.userId = userId;

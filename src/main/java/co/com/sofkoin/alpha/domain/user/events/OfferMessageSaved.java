@@ -16,6 +16,10 @@ public class OfferMessageSaved extends DomainEvent {
     private Double cryptoAmount;
     private Double cryptoPrice;
 
+    public OfferMessageSaved() {
+        super(OfferMessageSaved.class.getName());
+    }
+
     public OfferMessageSaved(String messageId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
         super(OfferMessageSaved.class.getName());
         this.messageId = messageId;
