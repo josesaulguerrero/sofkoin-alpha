@@ -133,9 +133,6 @@ class P2PTransactionUseCaseTest {
                 .when(this.domainEventRepository.saveDomainEvent((ArgumentMatchers.any(DomainEvent.class))))
                 .then(i -> Mono.just(i.getArgument(0)));
 
-      /*  BDDMockito.doAnswer(AdditionalAnswers.returnsArgAt(0)).when(this.domainEventRepository)
-                .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
-*/
 
         Flux<DomainEvent> triggeredevents = this.useCase.apply(Mono.just(command));
 
@@ -148,9 +145,6 @@ class P2PTransactionUseCaseTest {
 
                         domainEvents instanceof P2PTransactionCommitted)
                 .verifyComplete();
-
-        //    BDDMockito.verify(this.eventBus, BDDMockito.times(1))
-        //            .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
 
         BDDMockito.verify(this.domainEventRepository, BDDMockito.times(2))
                 .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
