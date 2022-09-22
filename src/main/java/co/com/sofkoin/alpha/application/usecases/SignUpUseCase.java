@@ -35,7 +35,7 @@ public class SignUpUseCase implements UseCase<SignUp> {
                                 new Email(c.getEmail()),
                                 new Phone(c.getPhoneNumber()),
                                 new Avatar(c.getAvatarUrl()),
-                                RegisterMethod.valueOf(c.getRegisterMethod().toUpperCase(Locale.ROOT).trim())
+                                RegisterMethod.valueOf(c.getAuthMethod().toUpperCase(Locale.ROOT).trim())
                         )
                 )
                 .flatMapIterable(AggregateEvent::getUncommittedChanges)

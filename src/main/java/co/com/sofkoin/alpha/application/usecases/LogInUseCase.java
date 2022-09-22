@@ -8,6 +8,7 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
+import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import co.com.sofkoin.alpha.domain.user.values.Email;
 import co.com.sofkoin.alpha.domain.user.values.Password;
 import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
@@ -27,39 +28,40 @@ import java.util.Locale;
 @AllArgsConstructor
 public class LogInUseCase implements UseCase<LogIn> {
 
-  private final DomainEventRepository domainEventRepository;
-  private final DomainEventBus domainEventBus;
-  private final JWTProvider tokenProvider;
-  private final ReactiveAuthenticationManager authenticationManager;
+    private final DomainEventRepository domainEventRepository;
+    private final DomainEventBus domainEventBus;
+    private final JWTProvider tokenProvider;
+    private final ReactiveAuthenticationManager authenticationManager;
 
-  @Override
-  public Flux<DomainEvent> apply(Mono<LogIn> command) {
-    return
-      command
-      .flatMap(com ->
-              authenticationManager
-              .authenticate(new UsernamePasswordAuthenticationToken(com.getEmail(), com.getPassword()))
-              .onErrorMap(BadCredentialsException.class, err -> new Throwable(HttpStatus.FORBIDDEN.toString()))
-              .map(tokenProvider::createJwtToken)
-              .flatMap(token ->
-                      domainEventRepository
-                      .findUserDomainEventsByEmail(com.getEmail())
-                      .collectList()
-                      .map(events -> {
-                        User user = User.from(new UserID(
-                                events.get(0).aggregateRootId()),
-                                events);
-
-                        user.logIn(
-                                new UserID(user.identity().value()),
-                                new Email(com.getEmail()),
-                                new Password(com.getPassword()),
-                                RegisterMethod.valueOf(com.getLoginMethod().toUpperCase(Locale.ROOT).trim()),
-                                token);
-
-                        return user;})))
-      .flatMapIterable(AggregateEvent::getUncommittedChanges)
-      .flatMap(domainEventRepository::saveDomainEvent)
-      .doOnNext(domainEventBus::publishEvent);
-  }
+    @Override
+    public Flux<DomainEvent> apply(Mono<LogIn> command) {
+        return
+                command
+                        .flatMap(com ->
+                                authenticationManager
+                                        .authenticate(new UsernamePasswordAuthenticationToken(com.getEmail(), com.getPassword()))
+                                        .onErrorMap(BadCredentialsException.class, err -> new Throwable(HttpStatus.FORBIDDEN.toString()))
+                                        .map(tokenProvider::createJwtToken)
+                                        .flatMap(token ->
+                                                domainEventRepository
+                                                        .findUserDomainEventsByEmail(com.getEmail())
+                                                        .collectList()
+                                                        .map(events -> {
+                                                            User user = User.from(
+                                                                    new UserID(((UserSignedUp) events.get(0)).getUserId()),
+                                                                    events
+                                                            );
+                                                            user.logIn(
+                                                                    new UserID(user.identity().value()),
+                                                                    new Email(com.getEmail()),
+                                                                    new Password(com.getPassword()),
+                                                                    RegisterMethod.valueOf(com.getAuthMethod().toUpperCase(Locale.ROOT).trim()),
+                                                                    token
+                                                            );
+                                                            return user;
+                                                        })))
+                        .flatMapIterable(AggregateEvent::getUncommittedChanges)
+                        .flatMap(domainEventRepository::saveDomainEvent)
+                        .doOnNext(domainEventBus::publishEvent);
+    }
 }

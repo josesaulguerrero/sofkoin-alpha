@@ -57,7 +57,7 @@ class LogInUseCaseTest {
             "Rueda",
             "2381732714",
             "http://somewhere.com",
-            command.getLoginMethod()
+            command.getAuthMethod()
     );
 
     evSignedUp.setAggregateRootId("7237127321");
@@ -66,7 +66,7 @@ class LogInUseCaseTest {
             evSignedUp.getUserId(),
             command.getEmail(),
             command.getPassword(),
-            command.getLoginMethod(),
+            command.getAuthMethod(),
             JWT_TOKEN
     );
 

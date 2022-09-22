@@ -56,7 +56,7 @@ class SignUpUseCaseTest {
                 command.getSurname(),
                 command.getPhoneNumber(),
                 command.getAvatarUrl(),
-                command.getRegisterMethod()
+                command.getAuthMethod()
         );
         BDDMockito
                 .when(this.domainEventRepository.saveDomainEvent(ArgumentMatchers.any(DomainEvent.class)))

@@ -8,7 +8,6 @@ import co.com.sofkoin.alpha.domain.user.commands.SignUp;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,6 @@ public class AuthController {
     private LogInUseCase loginUseCase;
 
     @PostMapping("signup")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<Flux<DomainEvent>> signUp(@RequestBody @Valid SignUp body) {
         return new ResponseEntity<>(
                 this.signUpUseCase.apply(Mono.just(body)),
@@ -35,7 +33,6 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<Flux<DomainEvent>> logIn(@RequestBody @Valid LogIn body) {
         return new ResponseEntity<>(
                 this.loginUseCase.apply(Mono.just(body)),
