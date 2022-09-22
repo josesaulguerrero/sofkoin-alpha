@@ -13,7 +13,7 @@ CryptoBalance implements ValueObject<CryptoBalance.Value> {
     private final String coinSymbol;
 
     public CryptoBalance(Double amount, String coinSymbol) {
-        if (!GenericValidator.minValue(amount, 0.0)) {
+        if (amount < 0.0) {
             throw new IllegalArgumentException("Crypto amount cannot be negative.");
         }
         this.amount = amount;
