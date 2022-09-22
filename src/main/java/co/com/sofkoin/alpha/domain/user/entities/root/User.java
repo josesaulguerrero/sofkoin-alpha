@@ -27,7 +27,7 @@ public class User extends AggregateEvent<UserID> {
     protected Phone phone;
     protected Cash cash;
     protected Avatar avatar;
-    protected RegisterMethod registerMethod;
+    protected AuthMethod authMethod;
     protected Set<CryptoBalance> cryptoBalances;
     protected Set<Activity> activities;
     protected Set<Transaction> transactions;
@@ -39,7 +39,7 @@ public class User extends AggregateEvent<UserID> {
                 Email email,
                 Phone phone,
                 Avatar avatar,
-                RegisterMethod registerMethod)
+                AuthMethod authMethod)
     {
         super(entityId);
         super
@@ -52,7 +52,7 @@ public class User extends AggregateEvent<UserID> {
                                 fullName.value().surname(),
                                 phone.value(),
                                 avatar.value(),
-                                registerMethod.name()
+                                authMethod.name()
                         )
                 )
                 .apply();
@@ -129,7 +129,7 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void logIn(UserID userId, Email email, Password password, RegisterMethod loginMethod, String jwt) {
+    public void logIn(UserID userId, Email email, Password password, AuthMethod loginMethod, String jwt) {
         super
                 .appendChange(
                         new UserLoggedIn(
@@ -196,8 +196,8 @@ public class User extends AggregateEvent<UserID> {
     return avatar;
   }
 
-  public RegisterMethod registerMethod() {
-    return registerMethod;
+  public AuthMethod authMethod() {
+    return authMethod;
   }
 
   public Set<CryptoBalance> cryptoBalances() {

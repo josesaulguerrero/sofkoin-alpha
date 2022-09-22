@@ -25,8 +25,8 @@ public class UserEventListener extends EventChange {
             user.phone = new Phone(event.getPhoneNumber());
             user.cash = new Cash(0.0);
             user.avatar = new Avatar(event.getAvatarUrl());
-            user.registerMethod = RegisterMethod.valueOf(
-                    event.getRegisterMethod().toUpperCase(Locale.ROOT).trim()
+            user.authMethod = AuthMethod.valueOf(
+                    event.getAuthMethod().toUpperCase(Locale.ROOT).trim()
             );
             user.cryptoBalances = new HashSet<>();
             user.activities = new HashSet<>();
@@ -131,6 +131,11 @@ public class UserEventListener extends EventChange {
         });
 
         super.apply((UserLoggedIn event) -> {
+            System.out.println(event.getAuthMethod());
+            System.out.println(user.authMethod());
+            if (!user.authMethod.name().equals(event.getAuthMethod().toUpperCase().trim())){
+                throw new IllegalArgumentException("The auth method does not match.");
+            }
             Activity login = new Activity(new ActivityID(), new Timestamp(), ActivityTypes.LOGIN);
             user.activities.add(login);
         });

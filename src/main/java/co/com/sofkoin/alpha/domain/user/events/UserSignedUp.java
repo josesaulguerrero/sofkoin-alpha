@@ -14,7 +14,7 @@ public class UserSignedUp extends DomainEvent {
     private String surname;
     private String phoneNumber;
     private String avatarUrl;
-    private String registerMethod;
+    private String authMethod;
 
     public UserSignedUp() {
         super(UserSignedUp.class.getName());
@@ -27,7 +27,7 @@ public class UserSignedUp extends DomainEvent {
                         String surname,
                         String phoneNumber,
                         String avatarUrl,
-                        String registerMethod) {
+                        String authMethod) {
         super(UserSignedUp.class.getName());
         this.userId = userId;
         this.email = email;
@@ -36,6 +36,6 @@ public class UserSignedUp extends DomainEvent {
         this.surname = surname;
         this.phoneNumber = phoneNumber;
         this.avatarUrl = avatarUrl;
-        this.registerMethod = registerMethod;
+        this.authMethod = authMethod;
     }
 }

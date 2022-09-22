@@ -6,7 +6,7 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.events.UserLoggedIn;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
-import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
+import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +46,7 @@ class LogInUseCaseTest {
     LogIn command = new LogIn(
             "someone@gmail.com",
             "my_strong_PASSWORD_12345",
-            RegisterMethod.MANUAL.name()
+            AuthMethod.MANUAL.name()
     );
 
     UserSignedUp evSignedUp = new UserSignedUp(

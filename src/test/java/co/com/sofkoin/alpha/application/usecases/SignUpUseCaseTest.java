@@ -6,7 +6,7 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.application.gateways.PasswordEncoder;
 import co.com.sofkoin.alpha.domain.user.commands.SignUp;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
-import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
+import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +46,7 @@ class SignUpUseCaseTest {
                 "Suarez",
                 "0980980998",
                 "http://somewhere.com",
-                RegisterMethod.MANUAL.name()
+                AuthMethod.MANUAL.name()
         );
         UserSignedUp event = new UserSignedUp(
                 UUID.randomUUID().toString(),

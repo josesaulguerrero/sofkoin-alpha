@@ -6,7 +6,7 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.events.OfferMessageSaved;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
-import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
+import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -47,7 +47,7 @@ class SaveOfferMessageUseCaseTest {
                 "Yepes",
                 "3108509630",
                 "https://www.freepik.es/psd-gratis/ilustracion-27470311",
-                RegisterMethod.MANUAL.name()
+                AuthMethod.MANUAL.name()
         );
 
         var senderSignedUp = new UserSignedUp(command.getSenderId(),
@@ -57,7 +57,7 @@ class SaveOfferMessageUseCaseTest {
                 "Calderón",
                 "3108512397",
                 "https://www.freepik.es/psd-gratis/ilustracion-27470375",
-                RegisterMethod.MANUAL.name()
+                AuthMethod.MANUAL.name()
         );
 
         BDDMockito.when(repositoryMock.findByAggregateRootId(command.getReceiverId()))

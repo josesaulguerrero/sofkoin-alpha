@@ -1,6 +1,6 @@
 package co.com.sofkoin.alpha.domain.user.values;
 
-public enum RegisterMethod {
+public enum AuthMethod {
     GITHUB,
     GMAIL,
     MANUAL

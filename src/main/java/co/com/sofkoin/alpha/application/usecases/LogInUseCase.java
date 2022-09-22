@@ -11,7 +11,7 @@ import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import co.com.sofkoin.alpha.domain.user.values.Email;
 import co.com.sofkoin.alpha.domain.user.values.Password;
-import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
+import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,7 @@ public class LogInUseCase implements UseCase<LogIn> {
                                                                     new UserID(user.identity().value()),
                                                                     new Email(com.getEmail()),
                                                                     new Password(com.getPassword()),
-                                                                    RegisterMethod.valueOf(com.getAuthMethod().toUpperCase(Locale.ROOT).trim()),
+                                                                    AuthMethod.valueOf(com.getAuthMethod().toUpperCase(Locale.ROOT).trim()),
                                                                     token
                                                             );
                                                             return user;
