@@ -150,6 +150,7 @@ public class UserEventListener extends EventChange {
                     new CryptoSymbol(event.getCryptoSymbol())
             );
             user.messages.add(message);
+            //Falta añadir el mensaje al segundo usuario
         });
     }
 }

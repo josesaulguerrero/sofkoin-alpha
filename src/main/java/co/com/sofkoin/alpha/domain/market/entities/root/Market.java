@@ -16,6 +16,7 @@ import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import co.com.sofkoin.alpha.domain.user.values.Timestamp;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class Market extends AggregateEvent<MarketID> {
@@ -26,7 +27,7 @@ public class Market extends AggregateEvent<MarketID> {
 
     public Market(MarketID marketID, Country country){
         super(marketID);
-        appendChange(new MarketCreated(marketID.value(), country.value())).apply();
+        appendChange(new MarketCreated(country.value())).apply();
     }
 
     private Market(MarketID marketID) {
@@ -54,6 +55,10 @@ public class Market extends AggregateEvent<MarketID> {
 
     public void deleteP2POffer(OfferId offerId){
         super.appendChange(new P2POfferDeleted(offerId.value())).apply();
+    }
+
+    public Optional<Offer> getOfferByID(OfferId offerId){
+        return offers.stream().filter((offer -> offer.identity().equals(offerId))).findFirst();
     }
 
 }
