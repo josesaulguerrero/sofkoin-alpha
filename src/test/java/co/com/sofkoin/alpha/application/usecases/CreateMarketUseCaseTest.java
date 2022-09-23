@@ -33,7 +33,7 @@ class CreateMarketUseCaseTest {
 
     @Test
     void createMarketUseCaseTest(){
-        CreateMarket command = new CreateMarket("415641", "Colombia");
+        CreateMarket command = new CreateMarket("Colombia");
         MarketCreated event = new MarketCreated("Colombia");
         event.setAggregateRootId("415641");
 
