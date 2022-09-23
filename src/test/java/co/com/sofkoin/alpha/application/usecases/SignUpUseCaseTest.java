@@ -62,6 +62,9 @@ class SignUpUseCaseTest {
                 .when(this.domainEventRepository.saveDomainEvent(ArgumentMatchers.any(DomainEvent.class)))
                 .thenReturn(Mono.just(event));
         BDDMockito
+                .when(this.domainEventRepository.findUserDomainEventsByEmail(ArgumentMatchers.anyString()))
+                .thenReturn(Flux.empty());
+        BDDMockito
                 .when(this.passwordEncoder.encode(ArgumentMatchers.anyString()))
                 .thenReturn(command.getPassword());
 
