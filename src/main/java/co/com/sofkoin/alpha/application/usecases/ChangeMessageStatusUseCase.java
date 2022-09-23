@@ -6,7 +6,6 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import co.com.sofkoin.alpha.domain.market.commands.PublishP2POffer;
-import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.commands.ChangeMessageStatus;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
@@ -60,15 +59,12 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus>{
                                 message.marketID().value(),
                                 command.getReceiverId(),
                                 command.getSenderId(),
-                                command.getMessageId(),
+                                message.cryptoSymbol().value(),
                                 message.proposalCryptoAmount().value(),
                                 message.proposalCryptoPrice().value()
                         );
-
                         publishP2POfferUseCase.apply(Mono.just(publishP2POffer)).subscribe();
                     }
-
-
                     return user.getUncommittedChanges();
                 }).flatMap(event -> {
                     bus.publishEvent(event);

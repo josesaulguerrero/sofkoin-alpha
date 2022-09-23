@@ -30,7 +30,7 @@ import java.util.List;
 public class TradeTransactionuseCase implements UseCase<CommitTradeTransaction> {
 
     private final DomainEventRepository repository;
-//    private final DomainEventBus bus;
+    private final DomainEventBus bus;
 
 
     @Override
@@ -52,10 +52,10 @@ public class TradeTransactionuseCase implements UseCase<CommitTradeTransaction> 
                     return user.getUncommittedChanges();
                 })
                 .map(domainEvent -> {
-             //       bus.publishEvent(domainEvent);
+                    bus.publishEvent(domainEvent);
                     return domainEvent;
                 })
-                .flatMap(event -> repository.saveDomainEvent(event))
+                .flatMap(repository::saveDomainEvent)
 
         );
     }

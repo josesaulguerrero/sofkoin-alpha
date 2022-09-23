@@ -48,6 +48,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                     .collectList()
                     .flatMapIterable(events ->{
                         User seller = User.from(new UserID(userId), events);
+                        System.out.println(seller);
                         seller.commitP2PTransaction(new TransactionID(),
                                 new UserID(command.getSellerId()),
                                 new UserID(command.getBuyerId()),
@@ -57,15 +58,12 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                                 transactionType.name(),
                                 new Cash(command.getCash()),
                                 new Timestamp());
-
                         log.info(transactionType.name() + " transaction running for User: " + seller);
-
                         return seller.getUncommittedChanges();
                     }).map(domainEvent -> {
-                        log.info(domainEvent.toString());
-                  //      bus.publishEvent(domainEvent);
+                        bus.publishEvent(domainEvent);
                         return domainEvent;
-                    }).flatMap(event -> repository.saveDomainEvent(event)));
+                    }).flatMap(repository::saveDomainEvent));
 
     }
 

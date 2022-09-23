@@ -1,6 +1,7 @@
 package co.com.sofkoin.alpha.application.usecases;
 
 import co.com.sofka.domain.generic.DomainEvent;
+import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.CommitTradeTransaction;
 import co.com.sofkoin.alpha.domain.user.events.TradeTransactionCommitted;
@@ -22,8 +23,9 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class TradeTransactionUseCaseTest {
+
     @Mock
-    private DomainEventRepository eventBus;
+    private DomainEventBus eventBus;
     @Mock
     private DomainEventRepository domainEventRepository;
 
@@ -89,6 +91,9 @@ class TradeTransactionUseCaseTest {
 
         BDDMockito.verify(this.domainEventRepository, BDDMockito.times(1))
                 .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
+
+        BDDMockito.verify(this.eventBus, BDDMockito.times(1))
+                .publishEvent(ArgumentMatchers.any(DomainEvent.class));
 
     }
 }

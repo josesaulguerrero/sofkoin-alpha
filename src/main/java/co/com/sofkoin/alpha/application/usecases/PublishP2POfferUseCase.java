@@ -25,21 +25,26 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
 
     DomainEventBus domainEventBus;
     DomainEventRepository domainEventRepository;
+
     @Override
     public Flux<DomainEvent> apply(Mono<PublishP2POffer> publishP2POfferCommand) {
         return publishP2POfferCommand.flatMapMany(command -> domainEventRepository.findByAggregateRootId(command.getMarketId())
                 .collectList()
                 .flatMapIterable(events -> {
-                    Market market = Market.from(new MarketID(command.getMarketId()),events);
-                    market.publishP2POffer(new OfferId(), new UserID(command.getPublisherId()),
-                            new CryptoSymbol(command.getCryptoSymbol()), new OfferCryptoAmount(command.getOfferCryptoAmount()),
-                            new OfferCryptoPrice(command.getOfferCryptoPrice()), new UserID(command.getTargetAudienceId()));
+                    Market market = Market.from(new MarketID(command.getMarketId()), events);
+                    market.publishP2POffer(new OfferId(),
+                            new UserID(command.getPublisherId()),
+                            new CryptoSymbol(command.getCryptoSymbol()),
+                            new OfferCryptoAmount(command.getOfferCryptoAmount()),
+                            new OfferCryptoPrice(command.getOfferCryptoPrice()),
+                            new UserID(command.getTargetAudienceId()));
                     return market.getUncommittedChanges();
                 })
                 .map(event -> {
                     log.info("PublishP2POfferUseCase working");
                     domainEventBus.publishEvent(event);
-                    return event;})
+                    return event;
+                })
                 .flatMap(event -> domainEventRepository.saveDomainEvent(event)));
     }
 

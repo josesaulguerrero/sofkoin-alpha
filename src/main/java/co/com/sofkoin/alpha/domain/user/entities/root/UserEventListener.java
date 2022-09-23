@@ -132,8 +132,6 @@ public class UserEventListener extends EventChange {
         });
 
         super.apply((UserLoggedIn event) -> {
-            System.out.println(event.getAuthMethod());
-            System.out.println(user.authMethod());
             if (!user.authMethod.name().equals(event.getAuthMethod().toUpperCase().trim())){
                 throw new IllegalArgumentException("The auth method does not match.");
             }

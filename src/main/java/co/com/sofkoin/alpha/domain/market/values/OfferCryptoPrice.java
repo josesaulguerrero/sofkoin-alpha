@@ -8,7 +8,7 @@ public class OfferCryptoPrice implements ValueObject<Double> {
     private final Double value;
 
     public OfferCryptoPrice(Double value) {
-        if (!GenericValidator.minValue(value, 0.0)) {
+        if (value < 0.0) {
             throw new IllegalArgumentException("Offer crypto price cannot be negative.");
         }
         this.value = value;
