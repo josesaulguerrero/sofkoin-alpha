@@ -40,7 +40,6 @@ class PublishP2POfferUseCaseTest {
         market.setAggregateRootId("5498vfcd");
         PublishP2POffer offer = new PublishP2POffer(
                 "5498vfcd",
-                "151fdea",
                 "edfanon303",
                 "XRP",
                 57.4,
