@@ -27,8 +27,18 @@ public class SignUpUseCase implements UseCase<SignUp> {
     @Override
     public Flux<DomainEvent> apply(Mono<SignUp> command) {
         return command
+                .flatMap(next -> {
+                    // Validate if an user with the given email is already registered.
+                    Flux<DomainEvent> events = this.domainEventRepository.findUserDomainEventsByEmail(next.getEmail());
+                    return events.hasElements()
+                            .map(containsElements -> {
+                                if (containsElements) {
+                                    throw new IllegalArgumentException("You cannot register more than one user with the same email.");
+                                }
+                                return next;
+                            });
+                })
                 .map(c -> {
-
                     Password password = new Password(c.getPassword());
                     Password encryptedPassword = new Password(this.passwordEncoder.encode(password.value()));
 
@@ -41,7 +51,6 @@ public class SignUpUseCase implements UseCase<SignUp> {
                             new Avatar(c.getAvatarUrl()),
                             AuthMethod.valueOf(c.getAuthMethod().toUpperCase(Locale.ROOT).trim())
                     );
-
                 })
                 .flatMapIterable(AggregateEvent::getUncommittedChanges)
                 .flatMap(event ->
