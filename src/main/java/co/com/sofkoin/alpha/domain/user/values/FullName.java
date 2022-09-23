@@ -12,7 +12,7 @@ public class FullName implements ValueObject<FullName.Values> {
     private final String surname;
 
     public FullName(String name, String surname) {
-        String FULL_NAME_REGEX = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]{3,}$";
+        String FULL_NAME_REGEX = "^[a-zA-ZÀ-ÿ\\u0020]{3,}$";
         if (!GenericValidator.matchRegexp(name, FULL_NAME_REGEX) || !GenericValidator.matchRegexp(surname, FULL_NAME_REGEX)) {
             throw new IllegalArgumentException("Invalid full name (Must contain at least three characters and no numbers).");
         }
