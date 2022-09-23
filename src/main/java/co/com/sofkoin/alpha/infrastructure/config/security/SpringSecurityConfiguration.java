@@ -58,7 +58,6 @@ public class SpringSecurityConfiguration {
                                 .findUserDomainEventsByEmail(email)
                                 .collectList()
                                 .map(events -> {
-                                    System.out.println(events);
                                     var user = co.com.sofkoin.alpha.domain.user.entities.root.User.from(
                                             new UserID(((UserSignedUp) events.get(0)).getUserId()), events
                                     );

@@ -40,8 +40,7 @@ public class User extends AggregateEvent<UserID> {
                 Email email,
                 Phone phone,
                 Avatar avatar,
-                AuthMethod authMethod)
-    {
+                AuthMethod authMethod) {
         super(entityId);
         super
                 .appendChange(
@@ -130,13 +129,12 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void logIn(UserID userId, Email email, Password password, AuthMethod loginMethod, String jwt) {
+    public void logIn(UserID userId, Email email, AuthMethod loginMethod, String jwt) {
         super
                 .appendChange(
                         new UserLoggedIn(
                                 userId.value(),
                                 email.value(),
-                                password.value(),
                                 loginMethod.name(),
                                 jwt
                         )
@@ -175,47 +173,47 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-  public FullName fullName() {
-    return fullName;
-  }
+    public FullName fullName() {
+        return fullName;
+    }
 
-  public Password password() {
-    return password;
-  }
+    public Password password() {
+        return password;
+    }
 
-  public Email email() {
-    return email;
-  }
+    public Email email() {
+        return email;
+    }
 
-  public Phone phone() {
-    return phone;
-  }
+    public Phone phone() {
+        return phone;
+    }
 
-  public Cash cash() {
-    return cash;
-  }
+    public Cash cash() {
+        return cash;
+    }
 
-  public Avatar avatar() {
-    return avatar;
-  }
+    public Avatar avatar() {
+        return avatar;
+    }
 
-  public AuthMethod authMethod() {
-    return authMethod;
-  }
+    public AuthMethod authMethod() {
+        return authMethod;
+    }
 
-  public Set<CryptoBalance> cryptoBalances() {
-    return cryptoBalances;
-  }
+    public Set<CryptoBalance> cryptoBalances() {
+        return cryptoBalances;
+    }
 
-  public Set<Activity> activities() {
-    return activities;
-  }
+    public Set<Activity> activities() {
+        return activities;
+    }
 
-  public Set<Transaction> transactions() {
-    return transactions;
-  }
+    public Set<Transaction> transactions() {
+        return transactions;
+    }
 
-  public Set<Message> messages() {
-    return messages;
-  }
+    public Set<Message> messages() {
+        return messages;
+    }
 }

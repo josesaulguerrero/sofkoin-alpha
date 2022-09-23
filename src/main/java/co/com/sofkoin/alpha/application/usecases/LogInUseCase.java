@@ -40,7 +40,7 @@ public class LogInUseCase implements UseCase<LogIn> {
                         .flatMap(com ->
                                 authenticationManager
                                         .authenticate(new UsernamePasswordAuthenticationToken(com.getEmail(), com.getPassword()))
-                                        .onErrorMap(BadCredentialsException.class, err -> new Throwable(HttpStatus.FORBIDDEN.toString()))
+                                        .onErrorMap(BadCredentialsException.class, e -> new IllegalArgumentException("The given password is invalid."))
                                         .map(tokenProvider::createJwtToken)
                                         .flatMap(token ->
                                                 domainEventRepository
@@ -54,7 +54,6 @@ public class LogInUseCase implements UseCase<LogIn> {
                                                             user.logIn(
                                                                     new UserID(user.identity().value()),
                                                                     new Email(com.getEmail()),
-                                                                    new Password(com.getPassword()),
                                                                     AuthMethod.valueOf(com.getAuthMethod().toUpperCase(Locale.ROOT).trim()),
                                                                     token
                                                             );

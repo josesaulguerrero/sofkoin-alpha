@@ -4,6 +4,7 @@ import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.infrastructure.commons.json.JSONMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.regex.Pattern;
 
 @Repository
@@ -24,9 +26,11 @@ public class MongodbDomainEventRepositoryAdapter implements DomainEventRepositor
     public Flux<DomainEvent> findByAggregateRootId(String id) {
         Query query = new Query(
                 Criteria.where("aggregateRootId").is(id)
-        );
+        ).with(Sort.by(Sort.Direction.ASC, "timestamp"));
+
         return this.mongodbTemplate
                 .find(query, DomainEventDocument.class, EVENTS_COLLECTION)
+                .sort(Comparator.comparing(DomainEventDocument::getTimestamp))
                 .map(this::mapDomainEventDocumentToDomainEvent);
     }
 
@@ -36,7 +40,8 @@ public class MongodbDomainEventRepositoryAdapter implements DomainEventRepositor
         Pattern pattern = Pattern.compile(regexp, Pattern.CASE_INSENSITIVE);
         Query query = new Query(
                 Criteria.where("JSONEvent").regex(pattern)
-        );
+        ).with(Sort.by(Sort.Direction.ASC, "timestamp"));;
+
         return this.mongodbTemplate.find(query, DomainEventDocument.class, EVENTS_COLLECTION)
                 .map(this::mapDomainEventDocumentToDomainEvent);
     }
