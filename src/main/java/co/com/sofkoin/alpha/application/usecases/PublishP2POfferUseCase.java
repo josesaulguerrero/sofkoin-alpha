@@ -33,6 +33,7 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
                 .flatMapIterable(events -> {
                     Market market = Market.from(new MarketID(command.getMarketId()), events);
                     market.publishP2POffer(new OfferId(),
+                            new MarketID(command.getMarketId()),
                             new UserID(command.getPublisherId()),
                             new CryptoSymbol(command.getCryptoSymbol()),
                             new OfferCryptoAmount(command.getOfferCryptoAmount()),

@@ -48,6 +48,7 @@ class PublishP2POfferUseCaseTest {
 
         P2POfferPublished offerEvent = new P2POfferPublished(
                 "151fdea",
+                "kat11Kmi",
                 "edfanon303",
                 "XRP",
                 57.4,

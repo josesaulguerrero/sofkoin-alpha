@@ -17,7 +17,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class DeleteP2POfferUseCaseTest {
     @Mock
@@ -40,6 +39,7 @@ class DeleteP2POfferUseCaseTest {
 
         P2POfferPublished offerEvent = new P2POfferPublished(
                 "151fdea",
+                "Tl11K3",
                 "edfanon303",
                 "XRP",
                 57.4,
@@ -49,7 +49,7 @@ class DeleteP2POfferUseCaseTest {
 
         DeleteP2POffer command = new DeleteP2POffer("5498vfcd", "151fdea");
 
-        P2POfferDeleted event = new P2POfferDeleted("151fdea");
+        P2POfferDeleted event = new P2POfferDeleted("151fdea", "11Kt13");
 
         Mockito.when(domainEventRepository.findByAggregateRootId(Mockito.any(String.class))).thenReturn(Flux.just(market,offerEvent));
         Mockito.when(domainEventRepository.saveDomainEvent(Mockito.any(P2POfferDeleted.class))).thenReturn(Mono.just(event));

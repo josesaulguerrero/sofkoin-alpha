@@ -29,9 +29,9 @@ public class DeleteP2POfferUseCase implements UseCase<DeleteP2POffer> {
                 .flatMapIterable(events -> {
                     Market market = Market.from(new MarketID(command.getMarketId()),events);
                     OfferId v = new OfferId(command.getOfferId());
-                    var a =market.getOfferByID(new OfferId(command.getOfferId())).isPresent();
+                    var a = market.getOfferByID(new OfferId(command.getOfferId())).isPresent();
                     if (market.getOfferByID(new OfferId(command.getOfferId())).isPresent()){
-                        market.deleteP2POffer(new OfferId(command.getOfferId()));
+                        market.deleteP2POffer(new OfferId(command.getOfferId()), new MarketID(command.getOfferId()));
                         log.info("DeleteP2POfferUseCase deleted successfully");
                         return market.getUncommittedChanges();
                     }
