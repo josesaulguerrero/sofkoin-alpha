@@ -27,17 +27,22 @@ public class SignUpUseCase implements UseCase<SignUp> {
     @Override
     public Flux<DomainEvent> apply(Mono<SignUp> command) {
         return command
-                .map(c ->
-                        new User(
-                                new UserID(),
-                                new FullName(c.getName(), c.getSurname()),
-                                new Password(this.passwordEncoder.encode(c.getPassword())),
-                                new Email(c.getEmail()),
-                                new Phone(c.getPhoneNumber()),
-                                new Avatar(c.getAvatarUrl()),
-                                AuthMethod.valueOf(c.getAuthMethod().toUpperCase(Locale.ROOT).trim())
-                        )
-                )
+                .map(c -> {
+
+                    Password password = new Password(c.getPassword());
+                    Password encryptedPassword = new Password(this.passwordEncoder.encode(password.value()));
+
+                    return new User(
+                            new UserID(),
+                            new FullName(c.getName(), c.getSurname()),
+                            encryptedPassword,
+                            new Email(c.getEmail()),
+                            new Phone(c.getPhoneNumber()),
+                            new Avatar(c.getAvatarUrl()),
+                            AuthMethod.valueOf(c.getAuthMethod().toUpperCase(Locale.ROOT).trim())
+                    );
+
+                })
                 .flatMapIterable(AggregateEvent::getUncommittedChanges)
                 .flatMap(event ->
                         this.domainEventRepository

@@ -26,4 +26,5 @@ public class MessageStatusChanged extends DomainEvent {
         this.messageId = messageId;
         this.newStatus = newStatus;
     }
+
 }
