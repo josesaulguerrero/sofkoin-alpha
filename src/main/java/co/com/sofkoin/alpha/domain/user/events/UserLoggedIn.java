@@ -11,7 +11,6 @@ import lombok.ToString;
 public class UserLoggedIn extends DomainEvent {
     private String userId;
     private String email;
-    private String password;
     private String authMethod;
     private String jwt;
 
@@ -19,11 +18,10 @@ public class UserLoggedIn extends DomainEvent {
         super(UserLoggedIn.class.getName());
     }
 
-    public UserLoggedIn(String userId, String email, String password, String authMethod, String jwt) {
+    public UserLoggedIn(String userId, String email, String authMethod, String jwt) {
         super(UserLoggedIn.class.getName());
         this.userId = userId;
         this.email = email;
-        this.password = password;
         this.authMethod = authMethod;
         this.jwt = jwt;
     }

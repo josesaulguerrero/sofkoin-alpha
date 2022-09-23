@@ -62,6 +62,9 @@ class SignUpUseCaseTest {
                 .when(this.domainEventRepository.saveDomainEvent(ArgumentMatchers.any(DomainEvent.class)))
                 .thenReturn(Mono.just(event));
         BDDMockito
+                .when(this.domainEventRepository.findUserDomainEventsByEmail(ArgumentMatchers.anyString()))
+                .thenReturn(Flux.empty());
+        BDDMockito
                 .when(this.passwordEncoder.encode(ArgumentMatchers.anyString()))
                 .thenReturn(command.getPassword());
 
@@ -82,6 +85,55 @@ class SignUpUseCaseTest {
                 .publishEvent(ArgumentMatchers.any(DomainEvent.class));
         BDDMockito
                 .verify(this.passwordEncoder, BDDMockito.times(1))
+                .encode(ArgumentMatchers.anyString());
+    }
+
+    @Test
+    @DisplayName("#apply should fail when the client tries to register more than one user with the same email address.")
+    public void apply_ShouldThrowAnException_WhenTheEmailIsAlreadyRegistered() {
+        // Arrange
+        SignUp command = new SignUp(
+                "someone@gmail.com",
+                "my_strong_PASSWORD_12345",
+                "Pepito",
+                "Suarez",
+                "0980980998",
+                "http://somewhere.com",
+                AuthMethod.MANUAL.name()
+        );
+        UserSignedUp event = new UserSignedUp(
+                UUID.randomUUID().toString(),
+                command.getEmail(),
+                command.getPassword(),
+                command.getName(),
+                command.getSurname(),
+                command.getPhoneNumber(),
+                command.getAvatarUrl(),
+                command.getAuthMethod()
+        );
+        BDDMockito
+                .when(this.domainEventRepository.findUserDomainEventsByEmail(ArgumentMatchers.anyString()))
+                .thenReturn(Flux.just(event));
+
+        // Act
+        Flux<DomainEvent> triggeredEvents = this.useCase.apply(Mono.just(command));
+
+        // Assert
+        StepVerifier.create(triggeredEvents)
+                .expectError(IllegalArgumentException.class)
+                .verify();
+
+        BDDMockito
+                .verify(this.domainEventRepository, BDDMockito.times(0))
+                .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
+        BDDMockito
+                .verify(this.domainEventRepository, BDDMockito.times(1))
+                .findUserDomainEventsByEmail(ArgumentMatchers.anyString());
+        BDDMockito
+                .verify(this.domainEventBus, BDDMockito.times(0))
+                .publishEvent(ArgumentMatchers.any(DomainEvent.class));
+        BDDMockito
+                .verify(this.passwordEncoder, BDDMockito.times(0))
                 .encode(ArgumentMatchers.anyString());
     }
 }
