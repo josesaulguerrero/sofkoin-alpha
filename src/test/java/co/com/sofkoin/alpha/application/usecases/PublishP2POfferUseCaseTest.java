@@ -42,7 +42,6 @@ class PublishP2POfferUseCaseTest {
                 "5498vfcd",
                 "151fdea",
                 "edfanon303",
-                "1fsvibreuiw",
                 "XRP",
                 57.4,
                 50.5);

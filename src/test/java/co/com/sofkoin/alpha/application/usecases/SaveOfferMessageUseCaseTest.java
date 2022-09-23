@@ -33,10 +33,10 @@ class SaveOfferMessageUseCaseTest {
     @Test
     void saveOfferMessageUseCaseTest(){
 
-        var command = new SaveOfferMessage("1", "2",
+        var command = new SaveOfferMessage("31232", "1", "2",
                 "BTC", 0.11, 19117.11);
 
-        var domainEvent = new OfferMessageSaved("17K11", command.getSenderId(),
+        var domainEvent = new OfferMessageSaved("17K11", command.getMarketId(), command.getSenderId(),
                 command.getReceiverId(), command.getCryptoSymbol(),
                 command.getCryptoAmount(), command.getCryptoPrice());
 

@@ -6,6 +6,7 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.values.TransactionCryptoAmount;
@@ -43,7 +44,9 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
                 .collectList()
                 .flatMapIterable(events -> {
                     User user = User.from(new UserID(userId), events);
-                    user.saveOfferMessage(messageId, new UserID(command.getSenderId()),
+                    user.saveOfferMessage(messageId,
+                            new MarketID(command.getMarketId()),
+                            new UserID(command.getSenderId()),
                             new UserID(command.getReceiverId()), new CryptoSymbol(command.getCryptoSymbol()),
                             new TransactionCryptoAmount(command.getCryptoAmount()),
                             new TransactionCryptoPrice(command.getCryptoPrice()));

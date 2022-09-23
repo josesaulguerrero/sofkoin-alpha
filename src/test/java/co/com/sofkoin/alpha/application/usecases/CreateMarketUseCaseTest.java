@@ -33,7 +33,7 @@ class CreateMarketUseCaseTest {
 
     @Test
     void createMarketUseCaseTest(){
-        CreateMarket command = new CreateMarket("415641", "Colombia");
+        CreateMarket command = new CreateMarket("Colombia");
         MarketCreated event = new MarketCreated("Colombia");
         event.setAggregateRootId("415641");
 
@@ -43,8 +43,7 @@ class CreateMarketUseCaseTest {
         var use = (Flux<DomainEvent>)createMarketUseCase.apply(Mono.just(command));
 
         StepVerifier.create(use)
-                .expectNextMatches(eventResult -> eventResult instanceof MarketCreated &&
-                        event.aggregateRootId().equals(eventResult.aggregateRootId()))
+                .expectNextMatches(eventResult -> eventResult instanceof MarketCreated)
                 .verifyComplete();
 
         Mockito.verify(domainEventRepository,Mockito.atLeastOnce()).saveDomainEvent(Mockito.any(MarketCreated.class));

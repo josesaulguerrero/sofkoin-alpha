@@ -2,6 +2,7 @@ package co.com.sofkoin.alpha.domain.user.entities;
 
 import co.com.sofka.domain.generic.Entity;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoAmount;
 import co.com.sofkoin.alpha.domain.user.values.ProposalCryptoPrice;
@@ -11,6 +12,7 @@ import lombok.ToString;
 
 @ToString
 public class Message extends Entity<MessageID> {
+    private final MarketID marketID;
     private final ProposalCryptoAmount proposalCryptoAmount;
 
     private final ProposalCryptoPrice proposalCryptoPrice;
@@ -23,10 +25,11 @@ public class Message extends Entity<MessageID> {
 
     private final CryptoSymbol cryptoSymbol;
 
-    public Message(MessageID entityId, ProposalCryptoAmount proposalCryptoAmount,
+    public Message(MessageID entityId, MarketID marketID, ProposalCryptoAmount proposalCryptoAmount,
                    ProposalCryptoPrice proposalCryptoPrice, MessageStatus messageStatus,
                    UserID senderId, UserID receiverId, CryptoSymbol cryptoSymbol) {
         super(entityId);
+        this.marketID = marketID;
         this.proposalCryptoAmount = proposalCryptoAmount;
         this.proposalCryptoPrice = proposalCryptoPrice;
         this.messageStatus = messageStatus;
@@ -53,6 +56,10 @@ public class Message extends Entity<MessageID> {
 
     public UserID senderId() {
         return senderId;
+    }
+
+    public MarketID marketID() {
+        return marketID;
     }
 
     public UserID receiverId() {

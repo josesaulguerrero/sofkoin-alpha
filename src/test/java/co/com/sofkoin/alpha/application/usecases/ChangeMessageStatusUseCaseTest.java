@@ -30,13 +30,17 @@ class ChangeMessageStatusUseCaseTest {
     @Mock
     DomainEventBus eventBus;
 
+    @Mock
+    PublishP2POfferUseCase publishP2POfferUseCase;
+
     @InjectMocks
     ChangeMessageStatusUseCase changeMessageStatusUseCase;
+
 
     @Test
     void changeMessageStatusUseCaseTest() {
 
-        var messageSaved = new OfferMessageSaved("175K", "2", "1", "BTC",
+        var messageSaved = new OfferMessageSaved("175K", "2131", "2", "1", "BTC",
                 0.05,19500.05);
 
         var command = new ChangeMessageStatus("1", "2",
@@ -70,6 +74,8 @@ class ChangeMessageStatusUseCaseTest {
 
         BDDMockito.when(repositoryMock.findByAggregateRootId(command.getSenderId()))
                 .thenReturn(Flux.just(senderSignedUp, messageSaved));
+
+        BDDMockito.when(publishP2POfferUseCase.apply(BDDMockito.any())).thenReturn(Flux.empty());
 
         BDDMockito.when(repositoryMock.saveDomainEvent(Mockito.any(DomainEvent.class)))
                 .thenReturn(Mono.just(domainEvent));

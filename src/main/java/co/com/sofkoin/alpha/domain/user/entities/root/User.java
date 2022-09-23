@@ -3,6 +3,7 @@ package co.com.sofkoin.alpha.domain.user.entities.root;
 import co.com.sofka.domain.generic.AggregateEvent;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.entities.Activity;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.Transaction;
@@ -152,6 +153,7 @@ public class User extends AggregateEvent<UserID> {
     }
 
     public void saveOfferMessage(MessageID messageId,
+                                 MarketID marketID,
                                  UserID senderId,
                                  UserID receiverId,
                                  CryptoSymbol cryptoSymbol,
@@ -162,6 +164,7 @@ public class User extends AggregateEvent<UserID> {
                 .appendChange(
                         new OfferMessageSaved(
                                 messageId.value(),
+                                marketID.value(),
                                 senderId.value(),
                                 receiverId.value(),
                                 cryptoSymbol.value(),
