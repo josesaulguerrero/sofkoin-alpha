@@ -65,7 +65,6 @@ class LogInUseCaseTest {
     UserLoggedIn evLogIn = new UserLoggedIn(
             evSignedUp.getUserId(),
             command.getEmail(),
-            command.getPassword(),
             command.getAuthMethod(),
             JWT_TOKEN
     );
