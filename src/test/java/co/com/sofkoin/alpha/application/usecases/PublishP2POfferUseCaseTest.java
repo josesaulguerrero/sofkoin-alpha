@@ -41,6 +41,7 @@ class PublishP2POfferUseCaseTest {
         PublishP2POffer offer = new PublishP2POffer(
                 "5498vfcd",
                 "edfanon303",
+                "11KM11T",
                 "XRP",
                 57.4,
                 50.5);
