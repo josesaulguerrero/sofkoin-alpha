@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.Locale;
 
 @Service
@@ -28,7 +27,6 @@ public class SignUpUseCase implements UseCase<SignUp> {
     public Flux<DomainEvent> apply(Mono<SignUp> command) {
         return command
                 .flatMap(next -> {
-                    // Validate if an user with the given email is already registered.
                     Flux<DomainEvent> events = this.domainEventRepository.findUserDomainEventsByEmail(next.getEmail());
                     return events.hasElements()
                             .map(containsElements -> {
