@@ -24,7 +24,7 @@ public class UserEventListener extends EventChange {
 
         super.apply((P2PTransactionCommitted event) -> p2pTransactionCommitted(event, user));
 
-        super.apply((TradeTransactionCommitted event) -> tradeTransactionCommited(event, user));
+        super.apply((TradeTransactionCommitted event) -> tradeTransactionCommitted(event, user));
 
         super.apply((WalletFunded event) -> walletFunded(event, user));
 
@@ -102,7 +102,7 @@ public class UserEventListener extends EventChange {
         }
     }
 
-    private static void tradeTransactionCommited(TradeTransactionCommitted event, User user) {
+    private static void tradeTransactionCommitted(TradeTransactionCommitted event, User user) {
         Transaction transaction = new Transaction(
                 new TransactionID(),
                 new Timestamp(),
