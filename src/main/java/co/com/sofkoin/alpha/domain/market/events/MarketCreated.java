@@ -11,14 +11,16 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MarketCreated extends DomainEvent {
+    private String marketId;
     private String country;
 
     public MarketCreated() {
         super(MarketCreated.class.getName());
     }
 
-    public MarketCreated(String country) {
+    public MarketCreated(String country, String marketId) {
         super(MarketCreated.class.getName());
         this.country = country;
+        this.marketId = marketId;
     }
 }

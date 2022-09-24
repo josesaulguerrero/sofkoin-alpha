@@ -27,7 +27,7 @@ public class Market extends AggregateEvent<MarketID> {
 
     public Market(MarketID marketID, Country country){
         super(marketID);
-        appendChange(new MarketCreated(country.value())).apply();
+        appendChange(new MarketCreated(country.value(), marketID.value())).apply();
     }
 
     private Market(MarketID marketID) {
