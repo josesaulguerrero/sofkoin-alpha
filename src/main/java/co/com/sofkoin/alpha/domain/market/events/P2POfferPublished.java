@@ -1,6 +1,7 @@
 package co.com.sofkoin.alpha.domain.market.events;
 
 import co.com.sofka.domain.generic.DomainEvent;
+import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,6 +17,10 @@ public class P2POfferPublished extends DomainEvent {
     private Double cryptoPrice;
 
     private String targetAudienceId;
+
+    public P2POfferPublished() {
+        super(P2POfferPublished.class.getName());
+    }
 
     public P2POfferPublished(String offerId,
                              String publisherId,

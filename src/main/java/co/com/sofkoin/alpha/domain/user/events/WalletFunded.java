@@ -13,6 +13,10 @@ public class WalletFunded extends DomainEvent {
     private Double cashAmount;
     private String timestamp;
 
+    public WalletFunded() {
+        super(WalletFunded.class.getName());
+    }
+
     public WalletFunded(String userId, Double cashAmount, String timestamp) {
         super(WalletFunded.class.getName());
         this.userId = userId;

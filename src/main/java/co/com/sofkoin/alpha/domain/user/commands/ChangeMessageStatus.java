@@ -9,6 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangeMessageStatus extends Command {
+
+    private String receiverId;
+    private String senderId;
     private String messageId;
     private String newStatus;
+
 }

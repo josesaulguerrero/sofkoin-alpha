@@ -10,5 +10,5 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class JSONDeserializationException extends RuntimeException {
-    private final String cause;
+    private final String message;
 }

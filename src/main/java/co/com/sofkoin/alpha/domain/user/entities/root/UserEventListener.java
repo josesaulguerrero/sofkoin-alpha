@@ -2,6 +2,7 @@ package co.com.sofkoin.alpha.domain.user.entities.root;
 
 import co.com.sofka.domain.generic.EventChange;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.entities.Activity;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.Transaction;
@@ -42,8 +43,8 @@ public class UserEventListener extends EventChange {
         user.phone = new Phone(event.getPhoneNumber());
         user.cash = new Cash(0.0);
         user.avatar = new Avatar(event.getAvatarUrl());
-        user.registerMethod = RegisterMethod.valueOf(
-                event.getRegisterMethod().toUpperCase(Locale.ROOT).trim()
+        user.authMethod = AuthMethod.valueOf(
+                event.getAuthMethod().toUpperCase(Locale.ROOT).trim()
         );
         user.cryptoBalances = new HashSet<>();
         user.activities = new HashSet<>();
@@ -159,6 +160,7 @@ public class UserEventListener extends EventChange {
     private static void offerMessageSaved(OfferMessageSaved event, User user) {
         Message message = new Message(
                 new MessageID(),
+                new MarketID(event.getMarketId()),
                 new ProposalCryptoAmount(event.getCryptoAmount()),
                 new ProposalCryptoPrice(event.getCryptoPrice()),
                 MessageStatus.PENDING,

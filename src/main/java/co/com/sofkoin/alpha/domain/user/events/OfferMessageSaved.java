@@ -9,6 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class OfferMessageSaved extends DomainEvent {
+    private String marketId;
     private String messageId;
     private String senderId;
     private String receiverId;
@@ -16,8 +17,13 @@ public class OfferMessageSaved extends DomainEvent {
     private Double cryptoAmount;
     private Double cryptoPrice;
 
-    public OfferMessageSaved(String messageId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
+    public OfferMessageSaved() {
         super(OfferMessageSaved.class.getName());
+    }
+
+    public OfferMessageSaved(String messageId, String marketId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
+        super(OfferMessageSaved.class.getName());
+        this.marketId = marketId;
         this.messageId = messageId;
         this.senderId = senderId;
         this.receiverId = receiverId;

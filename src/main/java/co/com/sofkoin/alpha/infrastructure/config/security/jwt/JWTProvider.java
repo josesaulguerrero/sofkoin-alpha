@@ -22,7 +22,7 @@ import java.util.Map;
 @Component
 @Data
 @Slf4j
-public class JwtTokenProvider {
+public class JWTProvider {
   private static final String SECRETE_KEY = "You°are°few°clicks°away°to°be°fooled";
   private static final Long VALID_TIME = 3600000L;
   private static final SecretKey secretKey =

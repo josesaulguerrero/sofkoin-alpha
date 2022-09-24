@@ -9,8 +9,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublishP2POffer extends Command {
+
+    private String marketId;
     private String publisherId;
     private String targetAudienceId;
+    private String cryptoSymbol;
     private Double offerCryptoAmount;
     private Double offerCryptoPrice;
+
 }

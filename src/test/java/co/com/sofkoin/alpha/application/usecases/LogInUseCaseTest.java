@@ -6,8 +6,8 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.events.UserLoggedIn;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
-import co.com.sofkoin.alpha.domain.user.values.RegisterMethod;
-import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JwtTokenProvider;
+import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
+import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -33,7 +33,7 @@ class LogInUseCaseTest {
   @Mock
   private DomainEventBus domainEventBus;
   @Mock
-  private JwtTokenProvider tokenProvider;
+  private JWTProvider tokenProvider;
   @Mock
   private ReactiveAuthenticationManager authenticationManager;
   @InjectMocks
@@ -46,7 +46,7 @@ class LogInUseCaseTest {
     LogIn command = new LogIn(
             "someone@gmail.com",
             "my_strong_PASSWORD_12345",
-            RegisterMethod.MANUAL.name()
+            AuthMethod.MANUAL.name()
     );
 
     UserSignedUp evSignedUp = new UserSignedUp(
@@ -57,7 +57,7 @@ class LogInUseCaseTest {
             "Rueda",
             "2381732714",
             "http://somewhere.com",
-            command.getLoginMethod()
+            command.getAuthMethod()
     );
 
     evSignedUp.setAggregateRootId("7237127321");
@@ -65,8 +65,7 @@ class LogInUseCaseTest {
     UserLoggedIn evLogIn = new UserLoggedIn(
             evSignedUp.getUserId(),
             command.getEmail(),
-            command.getPassword(),
-            command.getLoginMethod(),
+            command.getAuthMethod(),
             JWT_TOKEN
     );
 
@@ -77,7 +76,7 @@ class LogInUseCaseTest {
       .thenReturn(Mono.just(evLogIn));
 
     BDDMockito
-      .when(domainEventRepository.findDomainEventsByEmail(BDDMockito.anyString()))
+      .when(domainEventRepository.findUserDomainEventsByEmail(BDDMockito.anyString()))
       .thenReturn(Flux.just(evSignedUp));
 
     BDDMockito
@@ -113,7 +112,7 @@ class LogInUseCaseTest {
       .saveDomainEvent(BDDMockito.any(DomainEvent.class));
     BDDMockito
       .verify(domainEventRepository, BDDMockito.times(1))
-      .findDomainEventsByEmail(BDDMockito.anyString());
+      .findUserDomainEventsByEmail(BDDMockito.anyString());
     BDDMockito
       .verify(domainEventBus, BDDMockito.times(1))
       .publishEvent(BDDMockito.any(DomainEvent.class));

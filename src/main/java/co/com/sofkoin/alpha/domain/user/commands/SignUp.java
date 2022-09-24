@@ -15,5 +15,5 @@ public class SignUp extends Command {
     private String surname;
     private String phoneNumber;
     private String avatarUrl;
-    private String registerMethod;
+    private String authMethod;
 }

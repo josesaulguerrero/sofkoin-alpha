@@ -1,6 +1,7 @@
 package co.com.sofkoin.alpha.application.usecases;
 
 import co.com.sofka.domain.generic.DomainEvent;
+import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.CommitP2PTransaction;
 import co.com.sofkoin.alpha.domain.user.commands.CommitTradeTransaction;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class P2PTransactionUseCaseTest {
 
     @Mock
-    private DomainEventRepository eventBus;
+    private DomainEventBus eventBus;
     @Mock
     private DomainEventRepository domainEventRepository;
 
@@ -118,7 +119,7 @@ class P2PTransactionUseCaseTest {
                 new Timestamp().toString()
         );
 
-       BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
+        BDDMockito.when(this.domainEventRepository.findByAggregateRootId("1"))
                 .thenReturn(Flux.just(buyeruser,
                         walletfundedbuyer
                 ));
@@ -138,15 +139,15 @@ class P2PTransactionUseCaseTest {
 
         StepVerifier.create(triggeredevents)
                 .expectSubscription()
-                .expectNextMatches(domainEvents ->
-
-                        domainEvents instanceof P2PTransactionCommitted)
-                .expectNextMatches(domainEvents ->
-
-                        domainEvents instanceof P2PTransactionCommitted)
+                .expectNextMatches(domainEvents -> domainEvents instanceof P2PTransactionCommitted)
+                .expectNextMatches(domainEvents -> domainEvents instanceof P2PTransactionCommitted)
                 .verifyComplete();
 
         BDDMockito.verify(this.domainEventRepository, BDDMockito.times(2))
                 .saveDomainEvent(ArgumentMatchers.any(DomainEvent.class));
+
+        BDDMockito.verify(this.eventBus, BDDMockito.times(2))
+                .publishEvent(ArgumentMatchers.any(DomainEvent.class));
+
     }
 }

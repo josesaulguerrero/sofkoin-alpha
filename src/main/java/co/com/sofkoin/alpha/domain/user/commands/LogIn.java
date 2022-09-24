@@ -11,5 +11,5 @@ import lombok.*;
 public class LogIn extends Command {
     private String email;
     private String password;
-    private String loginMethod;
+    private String authMethod;
 }

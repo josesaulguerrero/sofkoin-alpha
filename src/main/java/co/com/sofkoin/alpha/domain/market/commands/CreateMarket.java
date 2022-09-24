@@ -8,7 +8,8 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteP2POffer extends Command {
-    private String marketId;
-    private String offerId;
+public class CreateMarket extends Command {
+
+    private String country;
+
 }

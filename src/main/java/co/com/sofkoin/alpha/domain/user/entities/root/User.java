@@ -3,6 +3,7 @@ package co.com.sofkoin.alpha.domain.user.entities.root;
 import co.com.sofka.domain.generic.AggregateEvent;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.entities.Activity;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.Transaction;
@@ -27,7 +28,7 @@ public class User extends AggregateEvent<UserID> {
     protected Phone phone;
     protected Cash cash;
     protected Avatar avatar;
-    protected RegisterMethod registerMethod;
+    protected AuthMethod authMethod;
     protected Set<CryptoBalance> cryptoBalances;
     protected Set<Activity> activities;
     protected Set<Transaction> transactions;
@@ -39,8 +40,7 @@ public class User extends AggregateEvent<UserID> {
                 Email email,
                 Phone phone,
                 Avatar avatar,
-                RegisterMethod registerMethod)
-    {
+                AuthMethod authMethod) {
         super(entityId);
         super
                 .appendChange(
@@ -52,7 +52,7 @@ public class User extends AggregateEvent<UserID> {
                                 fullName.value().surname(),
                                 phone.value(),
                                 avatar.value(),
-                                registerMethod.name()
+                                authMethod.name()
                         )
                 )
                 .apply();
@@ -69,12 +69,14 @@ public class User extends AggregateEvent<UserID> {
         return user;
     }
 
-    public void changeMessageStatus(MessageID messageId, MessageStatus status) {
+    public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
         super
                 .appendChange(
                         new MessageStatusChanged(
+                                receiverId.value(),
+                                senderId.value(),
                                 messageId.value(),
-                                status.name()
+                                newStatus.name()
                         )
                 )
                 .apply();
@@ -127,13 +129,12 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void logIn(UserID userId, Email email, Password password, RegisterMethod loginMethod, String jwt) {
+    public void logIn(UserID userId, Email email, AuthMethod loginMethod, String jwt) {
         super
                 .appendChange(
                         new UserLoggedIn(
                                 userId.value(),
                                 email.value(),
-                                password.value(),
                                 loginMethod.name(),
                                 jwt
                         )
@@ -149,11 +150,19 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void saveOfferMessage(MessageID messageId, UserID senderId, UserID receiverId, CryptoSymbol cryptoSymbol, TransactionCryptoAmount cryptoAmount, TransactionCryptoPrice cryptoPrice) {
+    public void saveOfferMessage(MessageID messageId,
+                                 MarketID marketID,
+                                 UserID senderId,
+                                 UserID receiverId,
+                                 CryptoSymbol cryptoSymbol,
+                                 TransactionCryptoAmount cryptoAmount,
+                                 TransactionCryptoPrice cryptoPrice
+    ) {
         super
                 .appendChange(
                         new OfferMessageSaved(
                                 messageId.value(),
+                                marketID.value(),
                                 senderId.value(),
                                 receiverId.value(),
                                 cryptoSymbol.value(),
@@ -164,47 +173,47 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-  public FullName fullName() {
-    return fullName;
-  }
+    public FullName fullName() {
+        return fullName;
+    }
 
-  public Password password() {
-    return password;
-  }
+    public Password password() {
+        return password;
+    }
 
-  public Email email() {
-    return email;
-  }
+    public Email email() {
+        return email;
+    }
 
-  public Phone phone() {
-    return phone;
-  }
+    public Phone phone() {
+        return phone;
+    }
 
-  public Cash cash() {
-    return cash;
-  }
+    public Cash cash() {
+        return cash;
+    }
 
-  public Avatar avatar() {
-    return avatar;
-  }
+    public Avatar avatar() {
+        return avatar;
+    }
 
-  public RegisterMethod registerMethod() {
-    return registerMethod;
-  }
+    public AuthMethod authMethod() {
+        return authMethod;
+    }
 
-  public Set<CryptoBalance> cryptoBalances() {
-    return cryptoBalances;
-  }
+    public Set<CryptoBalance> cryptoBalances() {
+        return cryptoBalances;
+    }
 
-  public Set<Activity> activities() {
-    return activities;
-  }
+    public Set<Activity> activities() {
+        return activities;
+    }
 
-  public Set<Transaction> transactions() {
-    return transactions;
-  }
+    public Set<Transaction> transactions() {
+        return transactions;
+    }
 
-  public Set<Message> messages() {
-    return messages;
-  }
+    public Set<Message> messages() {
+        return messages;
+    }
 }
