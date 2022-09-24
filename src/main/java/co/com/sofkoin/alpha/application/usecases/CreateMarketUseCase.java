@@ -28,9 +28,7 @@ public class CreateMarketUseCase implements UseCase<CreateMarket> {
         return createMarketCommand.flatMapIterable(command -> {
             Market market = new Market(new MarketID(), new Country(command.getCountry()));
             return market.getUncommittedChanges();
-        }).flatMap(event -> {
-            log.info("CreateMarketUseCase working");
-            return domainEventRepository.saveDomainEvent(event).thenReturn(event);
-        }).doOnNext(event -> domainEventBus.publishEvent(event));
+        }).flatMap(event -> domainEventRepository.saveDomainEvent(event))
+                .doOnNext(event -> domainEventBus.publishEvent(event));
     }
 }

@@ -19,12 +19,11 @@ import java.util.Set;
 public class MarketEventListener extends EventChange {
 
     public MarketEventListener(Market market){
+
         super.apply((MarketCreated event) -> {
             market.country = new Country(event.getCountry());
             market.offers = new HashSet<>();
             market.cryptoSymbols = new HashSet<>();
-            market.cryptoSymbols.addAll(Set.of(new CryptoSymbol("XRP"), new CryptoSymbol("BTC")));
-
         });
 
         super.apply((P2POfferPublished event) -> {
