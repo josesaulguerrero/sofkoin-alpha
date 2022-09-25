@@ -6,6 +6,8 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
+import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
+import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import co.com.sofkoin.alpha.domain.user.commands.CommitP2PTransaction;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.values.Cash;
@@ -62,6 +64,8 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                       user.commitP2PTransaction(new TransactionID(),
                                 new UserID(command.getSellerId()),
                                 new UserID(command.getBuyerId()),
+                                new OfferId(command.getOfferId()),
+                                new MarketID(command.getMarketId()),
                                 new CryptoSymbol(command.getCryptoSymbol()),
                                 new TransactionCryptoAmount(command.getCryptoAmount()),
                                 new TransactionCryptoPrice(command.getCryptoPrice()),

@@ -4,6 +4,7 @@ import co.com.sofka.domain.generic.AggregateEvent;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
+import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import co.com.sofkoin.alpha.domain.user.entities.Activity;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.Transaction;
@@ -116,13 +117,25 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void commitP2PTransaction(TransactionID transactionID, UserID sellerId, UserID buyerId, CryptoSymbol cryptoSymbol, TransactionCryptoAmount transactionCryptoAmount, TransactionCryptoPrice transactionCryptoPrice, String transactionType, Cash cash, Timestamp timestamp) {
+    public void commitP2PTransaction(TransactionID transactionID,
+                                     UserID sellerId,
+                                     UserID buyerId,
+                                     OfferId offerId,
+                                     MarketID marketId,
+                                     CryptoSymbol cryptoSymbol,
+                                     TransactionCryptoAmount transactionCryptoAmount,
+                                     TransactionCryptoPrice transactionCryptoPrice,
+                                     String transactionType,
+                                     Cash cash,
+                                     Timestamp timestamp) {
         super
                 .appendChange(
                         new P2PTransactionCommitted(
                                 transactionID.value(),
                                 sellerId.value(),
                                 buyerId.value(),
+                                offerId.value(),
+                                marketId.value(),
                                 cryptoSymbol.value(),
                                 transactionCryptoAmount.value(),
                                 transactionCryptoPrice.value(),

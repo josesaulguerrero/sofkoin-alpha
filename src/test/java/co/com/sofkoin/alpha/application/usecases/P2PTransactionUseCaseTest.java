@@ -43,6 +43,8 @@ class P2PTransactionUseCaseTest {
         CommitP2PTransaction command = new CommitP2PTransaction(
                 "2",
                 "1",
+                "11K",
+                "784",
                 "ETH",
                 1.0,
                 1.0,
@@ -50,10 +52,12 @@ class P2PTransactionUseCaseTest {
         );
 
         //events
-        P2PTransactionCommitted eventseller = new P2PTransactionCommitted(
+        P2PTransactionCommitted eventSeller = new P2PTransactionCommitted(
                 "33333",
                 "2",
                 "1",
+                "11K",
+                "784",
                 "ETH",
                 1.0,
                 1.0,
@@ -61,10 +65,12 @@ class P2PTransactionUseCaseTest {
                 1.0,
                 new Timestamp().toString()
         );
-        P2PTransactionCommitted eventbuyer = new P2PTransactionCommitted(
+        P2PTransactionCommitted eventBuyer = new P2PTransactionCommitted(
                 "33333",
                 "2",
                 "1",
+                "11K",
+                "784",
                 "ETH",
                 1.0,
                 1.0,
