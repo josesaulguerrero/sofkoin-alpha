@@ -34,7 +34,7 @@ class CreateMarketUseCaseTest {
     @Test
     void createMarketUseCaseTest(){
         CreateMarket command = new CreateMarket("Colombia");
-        MarketCreated event = new MarketCreated("Colombia");
+        MarketCreated event = new MarketCreated("Colombia" , "12478KL11");
         event.setAggregateRootId("415641");
 
         Mockito.when(domainEventRepository.saveDomainEvent(Mockito.any(MarketCreated.class)))

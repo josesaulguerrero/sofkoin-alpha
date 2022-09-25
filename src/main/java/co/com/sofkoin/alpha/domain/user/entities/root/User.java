@@ -4,6 +4,7 @@ import co.com.sofka.domain.generic.AggregateEvent;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.domain.common.values.CryptoSymbol;
 import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
+import co.com.sofkoin.alpha.domain.market.values.identities.OfferId;
 import co.com.sofkoin.alpha.domain.user.entities.Activity;
 import co.com.sofkoin.alpha.domain.user.entities.Message;
 import co.com.sofkoin.alpha.domain.user.entities.Transaction;
@@ -73,7 +74,7 @@ public class User extends AggregateEvent<UserID> {
         CryptoBalance crypto = this.cryptoBalances.stream().filter(cryptoBalance ->
                 cryptoBalance.value().coinSymbol().equals(symbol)
         ).findFirst().orElseThrow(() ->
-                new IllegalArgumentException("The user doesn't have cryptos with the given symbol.")
+                new IllegalArgumentException("The user doesn't have enough " + symbol + ".")
         );
 
         return crypto.value().amount();
@@ -83,6 +84,9 @@ public class User extends AggregateEvent<UserID> {
     public void validateBuyTransaction(Double cash) {
         if(cash > this.cash.value()) {
             throw new IllegalArgumentException("The user doesn't have enough cash to buy the given crypto.");
+        }
+        if(cash < 5.0 || cash > 100000.0 ){
+            throw new IllegalArgumentException("The minimum value for a transaction is 5 USD and the maximum value is 100.000 USD.");
         }
     }
 
@@ -101,6 +105,10 @@ public class User extends AggregateEvent<UserID> {
         if(transactionCryptoAmount > userCryptoAmount) {
             throw new IllegalArgumentException("The user doesn't have enough crypto to sell to the exchange.");
         }
+        if(transactionCryptoAmount < 0.000001 || transactionCryptoAmount > 100000.0 ){
+            throw new IllegalArgumentException("The minimum value for a transaction is 0.0000001" +
+                    cryptoSymbol + " and the maximum value is 100.000" + cryptoSymbol + ".");
+        }
     }
 
     public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
@@ -116,13 +124,25 @@ public class User extends AggregateEvent<UserID> {
                 .apply();
     }
 
-    public void commitP2PTransaction(TransactionID transactionID, UserID sellerId, UserID buyerId, CryptoSymbol cryptoSymbol, TransactionCryptoAmount transactionCryptoAmount, TransactionCryptoPrice transactionCryptoPrice, String transactionType, Cash cash, Timestamp timestamp) {
+    public void commitP2PTransaction(TransactionID transactionID,
+                                     UserID sellerId,
+                                     UserID buyerId,
+                                     OfferId offerId,
+                                     MarketID marketId,
+                                     CryptoSymbol cryptoSymbol,
+                                     TransactionCryptoAmount transactionCryptoAmount,
+                                     TransactionCryptoPrice transactionCryptoPrice,
+                                     String transactionType,
+                                     Cash cash,
+                                     Timestamp timestamp) {
         super
                 .appendChange(
                         new P2PTransactionCommitted(
                                 transactionID.value(),
                                 sellerId.value(),
                                 buyerId.value(),
+                                offerId.value(),
+                                marketId.value(),
                                 cryptoSymbol.value(),
                                 transactionCryptoAmount.value(),
                                 transactionCryptoPrice.value(),

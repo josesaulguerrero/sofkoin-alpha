@@ -31,10 +31,12 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
   public Flux<DomainEvent> apply(Mono<PublishP2POffer> publishP2POfferCommand) {
     return publishP2POfferCommand.flatMapMany(command ->
             domainEventRepository.findByAggregateRootId(command.getMarketId())
+                    .switchIfEmpty(Mono.error(new IllegalArgumentException("The market with the given id does not exist.")))
                     .collectList()
-                    .doOnNext(events ->
+                    .flatMap(events ->
                             domainEventRepository
                             .findByAggregateRootId(command.getPublisherId())
+                            .switchIfEmpty(Mono.error(new IllegalArgumentException("The user with the given id does not exist.")))
                             .collectList()
                             .doOnNext(userEvents -> {
                               User user = User.from(new UserID(command.getPublisherId()), userEvents);
@@ -45,11 +47,9 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
                                 throw new IllegalArgumentException("the user doesn't count with enough crypto funds to publish the given offer.");
                               }
                             })
-                            .subscribe())
+                            .thenReturn(events))
                     .flatMapIterable(events -> {
                       Market market = Market.from(new MarketID(command.getMarketId()), events);
-
-
                       market.publishP2POffer(
                               new OfferId(),
                               new MarketID(command.getMarketId()),

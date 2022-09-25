@@ -32,7 +32,7 @@ public class FundWalletUseCase implements UseCase<FundWallet> {
                 .collectList()
                 .flatMapIterable(domainEvents -> {
                     var userID = new UserID(command.getUserId());
-                    User user = User.from(userID, (List<DomainEvent>) domainEvents);
+                    User user = User.from(userID, domainEvents);
                     user.fundWallet(userID, new Cash(command.getCashAmount()), new Timestamp());
                     return user.getUncommittedChanges();
                 })

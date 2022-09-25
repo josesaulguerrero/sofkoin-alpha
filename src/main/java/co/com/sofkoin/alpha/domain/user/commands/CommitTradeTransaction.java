@@ -14,5 +14,4 @@ public class CommitTradeTransaction extends Command {
     private String cryptoSymbol;
     private Double cryptoAmount;
     private Double cryptoPrice;
-    private Double cash;
 }

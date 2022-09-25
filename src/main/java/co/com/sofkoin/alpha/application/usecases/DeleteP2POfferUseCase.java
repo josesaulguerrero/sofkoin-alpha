@@ -25,20 +25,20 @@ public class DeleteP2POfferUseCase implements UseCase<DeleteP2POffer> {
     @Override
     public Flux<DomainEvent> apply(Mono<DeleteP2POffer> deleteP2POfferCommand) {
         return deleteP2POfferCommand.flatMapMany(command -> domainEventRepository.findByAggregateRootId(command.getMarketId())
-                .collectList()
-                .flatMapIterable(events -> {
-                    Market market = Market.from(new MarketID(command.getMarketId()),events);
-                    OfferId v = new OfferId(command.getOfferId());
-                    var a = market.getOfferByID(new OfferId(command.getOfferId())).isPresent();
-                    if (market.getOfferByID(new OfferId(command.getOfferId())).isPresent()){
-                        market.deleteP2POffer(new OfferId(command.getOfferId()), new MarketID(command.getOfferId()));
-                        log.info("DeleteP2POfferUseCase deleted successfully");
-                        return market.getUncommittedChanges();
-                    }
-                    log.info("DeleteP2POfferUseCase: Message Id is not present");
-                    return market.getUncommittedChanges();
-                })
-                .flatMap(event -> domainEventRepository.saveDomainEvent(event)))
+                        .switchIfEmpty(Mono.error(new IllegalArgumentException("The market with the given Id does not exist.")))
+                        .collectList()
+                        .flatMapIterable(events -> {
+                            Market market = Market.from(new MarketID(command.getMarketId()), events);
+
+                            OfferId offerId = new OfferId(command.getOfferId());
+                            var offer = market.findOfferById(offerId.value());
+
+                            market.deleteP2POffer(offer.identity());
+                            log.info("DeleteP2POfferUseCase deleted successfully");
+
+                            return market.getUncommittedChanges();
+                        })
+                        .flatMap(event -> domainEventRepository.saveDomainEvent(event)))
                 .doOnNext(event -> domainEventBus.publishEvent(event));
     }
 }

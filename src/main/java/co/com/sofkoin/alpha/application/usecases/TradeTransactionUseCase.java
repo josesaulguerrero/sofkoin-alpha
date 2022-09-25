@@ -32,7 +32,7 @@ public class TradeTransactionUseCase implements UseCase<CommitTradeTransaction> 
 
         return  tradeTransactionCommand.flatMapMany(command -> repository.findByAggregateRootId(command.getBuyerId())
                 .collectList()
-                .doOnNext(events ->
+                .flatMap(events ->
                         repository
                         .findByAggregateRootId(command.getBuyerId())
                         .collectList()
@@ -45,7 +45,7 @@ public class TradeTransactionUseCase implements UseCase<CommitTradeTransaction> 
                                   );
 
                           if (TransactionTypes.BUY.equals(transactionTypes)) {
-                            user.validateBuyTransaction(command.getCash());
+                            user.validateBuyTransaction(command.getCryptoAmount() * command.getCryptoPrice());
 
                           } else if (TransactionTypes.SELL.equals(transactionTypes)) {
                             user.validateSellTransaction(command.getCryptoAmount(), command.getCryptoSymbol());
@@ -53,17 +53,17 @@ public class TradeTransactionUseCase implements UseCase<CommitTradeTransaction> 
                           } else
                             throw new IllegalArgumentException("The given transaction type is not allowed.");
 
-                        }))
+                        }).thenReturn(events))
                 .flatMapIterable(events ->{
                     User user = User.from(new UserID(command.getBuyerId()), events);
 
                     user.commitTradeTransaction(new TransactionID(),
                             new UserID(command.getBuyerId()),
-                            TransactionTypes.BUY,
+                            TransactionTypes.valueOf(command.getTransactionType().toUpperCase(Locale.ROOT).trim()),
                             new CryptoSymbol(command.getCryptoSymbol()),
                             new TransactionCryptoAmount(command.getCryptoAmount()),
                             new TransactionCryptoPrice(command.getCryptoPrice()),
-                            new Cash(command.getCash()),
+                            new Cash(command.getCryptoAmount() * command.getCryptoPrice()),
                             new Timestamp());
 
                     log.info("User transaction running");
