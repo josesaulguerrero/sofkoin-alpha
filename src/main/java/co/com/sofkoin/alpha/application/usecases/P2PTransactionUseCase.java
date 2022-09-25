@@ -38,29 +38,26 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
     @Override
     public Flux<DomainEvent> apply(Mono<CommitP2PTransaction> P2PTransactionCommand) {
 
-        Mono<Offer> offer = P2PTransactionCommand
-                .flatMap(command -> {
+        return P2PTransactionCommand
+                .flatMapMany(command -> {
                     return repository.findByAggregateRootId(command.getMarketId())
-                        .collectList()
-                        .map(marketEvents -> Market.from(new MarketID(command.getMarketId()), marketEvents))
-                        .map(market -> {
-                            Offer offerToDelete = market.findOfferById(command.getOfferId());
-                            DeleteP2POffer deleteP2POfferCommand =
-                                    new DeleteP2POffer(market.identity().value(), offerToDelete.identity().value());
-                            deleteP2POfferUseCase.apply(Mono.just(deleteP2POfferCommand)).subscribe();
-                            return offerToDelete;
-                        });
+                            .switchIfEmpty(Mono.error(new IllegalArgumentException("The market with the given id does not exist")))
+                            .collectList()
+                            .map(marketEvents -> Market.from(new MarketID(command.getMarketId()), marketEvents))
+                            .flatMapMany(market -> {
+                                Offer offerToDelete = market.findOfferById(command.getOfferId());
+
+                                var buyerFlux =
+                                        P2PTransaction(command, command.getBuyerId(), TransactionTypes.BUY);
+                                var sellerFlux =
+                                        P2PTransaction(command, command.getSellerId(), TransactionTypes.SELL);
+
+                                DeleteP2POffer deleteP2POfferCommand =
+                                        new DeleteP2POffer(market.identity().value(), offerToDelete.identity().value());
+                                return deleteP2POfferUseCase.apply(Mono.just(deleteP2POfferCommand))
+                                        .thenMany(Flux.merge(buyerFlux, sellerFlux));
+                            });
                 });
-
-        Flux<DomainEvent> buyerFlux = P2PTransactionCommand
-                .flatMapMany(command -> P2PTransaction(command, command.getBuyerId(), TransactionTypes.BUY));
-
-        Flux<DomainEvent> sellerFlux = P2PTransactionCommand
-                .flatMapMany(command -> P2PTransaction(command, command.getSellerId(), TransactionTypes.SELL));
-
-        offer.subscribe();
-
-        return Flux.merge(buyerFlux, sellerFlux);
     }
 
     private Flux<DomainEvent> P2PTransaction(CommitP2PTransaction command,
@@ -70,7 +67,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("The user with the given Id does not exist.")))
                 .collectList()
                 .map(events -> User.from(new UserID(userId), events))
-                .doOnNext(user -> {
+                .map(user -> {
                     if (TransactionTypes.BUY.equals(transactionType)) {
                         user.validateBuyTransaction(command.getCryptoAmount() * command.getCryptoPrice());
 
@@ -79,6 +76,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
 
                     } else throw new IllegalArgumentException("The given transaction type is not allowed.");
 
+                    return user;
                 })
                 .flatMapIterable(user -> {
 
