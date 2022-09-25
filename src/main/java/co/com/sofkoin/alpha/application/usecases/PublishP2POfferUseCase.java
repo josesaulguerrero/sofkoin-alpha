@@ -36,8 +36,8 @@ public class PublishP2POfferUseCase implements UseCase<PublishP2POffer> {
                             domainEventRepository
                             .findByAggregateRootId(command.getPublisherId())
                             .collectList()
-                            .doOnNext(evs -> {
-                              User user = User.from(new UserID(command.getPublisherId()), evs);
+                            .doOnNext(userEvents -> {
+                              User user = User.from(new UserID(command.getPublisherId()), userEvents);
 
                               Double userCryptoAmount = user.findCryptoAmountBySymbol(command.getCryptoSymbol().trim());
 

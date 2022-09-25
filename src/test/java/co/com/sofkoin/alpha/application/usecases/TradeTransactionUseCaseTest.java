@@ -30,7 +30,7 @@ class TradeTransactionUseCaseTest {
     private DomainEventRepository domainEventRepository;
 
     @InjectMocks
-    private TradeTransactionuseCase useCase;
+    private TradeTransactionUseCase useCase;
 
     @Test
     void tradeTransactionUseCase() {
