@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 
 import java.util.Collections;
 
@@ -26,10 +27,11 @@ public class SpringSecurityConfiguration {
     @Bean
     public SecurityWebFilterChain getWebFilterChain(
             ServerHttpSecurity http,
-            JWTProvider JWTProvider
+            JWTProvider JWTProvider,
+            CorsConfigurationSource corsConfigurationSource
     ) {
         return http
-                .cors().disable()
+                .cors().configurationSource(corsConfigurationSource).and()
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
