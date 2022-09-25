@@ -86,7 +86,15 @@ public class User extends AggregateEvent<UserID> {
         }
     }
 
-
+    public Message findMessageById(String messageId) {
+        return
+          this
+            .messages().stream()
+            .filter(msg -> msg.identity().value().equals(messageId))
+            .findFirst().orElseThrow(() ->
+                  new IllegalArgumentException("The message with the given ID doesn't exist in this user.")
+            );
+    }
     public void validateSellTransaction(Double transactionCryptoAmount, String cryptoSymbol) {
         Double userCryptoAmount = this.findCryptoAmountBySymbol(cryptoSymbol);
 

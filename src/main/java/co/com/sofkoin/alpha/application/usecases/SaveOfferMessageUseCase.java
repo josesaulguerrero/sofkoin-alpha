@@ -39,7 +39,7 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
 
         return repository.findByAggregateRootId(userId)
                 .switchIfEmpty(Mono.defer(() ->
-                        Mono.error(new Throwable("User id: " + command.getReceiverId() + " not found.")))
+                        Mono.error(new IllegalArgumentException("User id: " + command.getReceiverId() + " not found.")))
                 )
                 .collectList()
                 .map(events -> User.from(new UserID(userId), events))
