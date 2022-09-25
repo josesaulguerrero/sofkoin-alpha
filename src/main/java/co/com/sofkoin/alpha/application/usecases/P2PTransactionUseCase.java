@@ -30,26 +30,36 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
     private final DomainEventBus bus;
 
     @Override
-    public Flux<DomainEvent> apply(Mono<CommitP2PTransaction> P2Ptransactioncommand) {
+    public Flux<DomainEvent> apply(Mono<CommitP2PTransaction> P2PTransactionCommand) {
 
-        Flux<DomainEvent> buyerFlux = P2Ptransactioncommand
-                .flatMapMany(command -> P2PTransaction(P2Ptransactioncommand, command.getBuyerId(), TransactionTypes.BUY));
+        Flux<DomainEvent> buyerFlux = P2PTransactionCommand
+                .flatMapMany(command -> P2PTransaction(P2PTransactionCommand, command.getBuyerId(), TransactionTypes.BUY));
 
-        Flux<DomainEvent> sellerFlux = P2Ptransactioncommand
-                .flatMapMany(command -> P2PTransaction(P2Ptransactioncommand, command.getSellerId(), TransactionTypes.SELL));
+        Flux<DomainEvent> sellerFlux = P2PTransactionCommand
+                .flatMapMany(command -> P2PTransaction(P2PTransactionCommand, command.getSellerId(), TransactionTypes.SELL));
 
         return Flux.merge(buyerFlux,sellerFlux);
     }
 
-    public Flux<DomainEvent> P2PTransaction(Mono<CommitP2PTransaction> P2Ptransactioncommand, String userId, TransactionTypes transactionType) {
+    public Flux<DomainEvent> P2PTransaction(Mono<CommitP2PTransaction> P2PTransactionCommand, String userId, TransactionTypes transactionType) {
 
-    return P2Ptransactioncommand.flatMapMany(command ->
+    return P2PTransactionCommand.flatMapMany(command ->
             repository.findByAggregateRootId(userId)
                     .collectList()
-                    .flatMapIterable(events ->{
-                        User seller = User.from(new UserID(userId), events);
-                        System.out.println(seller);
-                        seller.commitP2PTransaction(new TransactionID(),
+                    .map(events -> User.from(new UserID(userId), events))
+                    .doOnNext(user -> {
+                          if(TransactionTypes.BUY.equals(transactionType)) {
+                            user.validateBuyTransaction(command.getCash());
+
+                          } else if(TransactionTypes.SELL.equals(transactionType)) {
+                            user.validateSellTransaction(command.getCryptoAmount(), command.getCryptoSymbol());
+
+                          } else throw new IllegalArgumentException("The given transaction type is not allowed.");
+
+                    })
+                    .flatMapIterable(user -> {
+
+                      user.commitP2PTransaction(new TransactionID(),
                                 new UserID(command.getSellerId()),
                                 new UserID(command.getBuyerId()),
                                 new CryptoSymbol(command.getCryptoSymbol()),
@@ -58,8 +68,9 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                                 transactionType.name(),
                                 new Cash(command.getCash()),
                                 new Timestamp());
-                        log.info(transactionType.name() + " transaction running for User: " + seller);
-                        return seller.getUncommittedChanges();
+
+                        log.info(transactionType.name() + " transaction running for User: " + user);
+                        return user.getUncommittedChanges();
                     }).map(domainEvent -> {
                         bus.publishEvent(domainEvent);
                         return domainEvent;
