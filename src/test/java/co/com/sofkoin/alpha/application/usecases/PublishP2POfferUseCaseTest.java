@@ -36,7 +36,7 @@ class PublishP2POfferUseCaseTest {
 
     @Test
     void publishP2POfferUseCaseTest() {
-        MarketCreated market = new MarketCreated("Colombia");
+        MarketCreated market = new MarketCreated("Colombia", "23812");
         market.setAggregateRootId("5498vfcd");
         PublishP2POffer offer = new PublishP2POffer(
                 "5498vfcd",

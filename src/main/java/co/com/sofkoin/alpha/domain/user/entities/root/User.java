@@ -69,6 +69,16 @@ public class User extends AggregateEvent<UserID> {
         return user;
     }
 
+    public Double findCryptoAmountBySymbol(String symbol) {
+        CryptoBalance crypto = this.cryptoBalances.stream().filter(cryptoBalance ->
+                cryptoBalance.value().coinSymbol().equals(symbol)
+        ).findFirst().orElseThrow(() ->
+                new IllegalArgumentException("The user doesn't have cryptos with the given symbol.")
+        );
+
+        return crypto.value().amount();
+    }
+
     public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
         super
                 .appendChange(
