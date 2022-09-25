@@ -24,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class JWTProvider {
   private static final String SECRET_KEY = "You°are°few°clicks°away°to°be°fooled";
-  private static final Long VALID_TIME = 300000L;
+  private static final Long VALID_TIME = 3600000L;
   private static final SecretKey secretKey =
     Keys.hmacShaKeyFor(
       Base64.getEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8)).getBytes()
