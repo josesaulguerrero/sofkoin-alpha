@@ -42,8 +42,16 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
                         Mono.error(new Throwable("User id: " + command.getReceiverId() + " not found.")))
                 )
                 .collectList()
-                .flatMapIterable(events -> {
-                    User user = User.from(new UserID(userId), events);
+                .map(events -> User.from(new UserID(userId), events))
+                .doOnNext(user -> {
+                    if(command.getReceiverId().equals(userId)) {
+                        this.validateReceiverCryptos(
+                                command.getCryptoAmount(),
+                                user.findCryptoAmountBySymbol(command.getCryptoSymbol())
+                        );
+                    }
+                })
+                .flatMapIterable(user -> {
                     user.saveOfferMessage(messageId,
                             new MarketID(command.getMarketId()),
                             new UserID(command.getSenderId()),
@@ -55,6 +63,12 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
                     bus.publishEvent(event);
                     return repository.saveDomainEvent(event).thenReturn(event);
                 });
+    }
+
+    private void validateReceiverCryptos(Double proposalCryptoAmount, Double userAvailableCryptoAmount) {
+        if(proposalCryptoAmount > userAvailableCryptoAmount) {
+            throw new IllegalArgumentException("The receiver doesn't have enough cryptos, you can't send the offer message.");
+        }
     }
 
 }
