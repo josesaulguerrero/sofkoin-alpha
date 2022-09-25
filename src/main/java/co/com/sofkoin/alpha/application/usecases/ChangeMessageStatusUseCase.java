@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
 public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> {
 
   private final DomainEventBus bus;
