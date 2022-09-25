@@ -69,6 +69,40 @@ public class User extends AggregateEvent<UserID> {
         return user;
     }
 
+    public Double findCryptoAmountBySymbol(String symbol) {
+        CryptoBalance crypto = this.cryptoBalances.stream().filter(cryptoBalance ->
+                cryptoBalance.value().coinSymbol().equals(symbol)
+        ).findFirst().orElseThrow(() ->
+                new IllegalArgumentException("The user doesn't have cryptos with the given symbol.")
+        );
+
+        return crypto.value().amount();
+    }
+
+
+    public void validateBuyTransaction(Double cash) {
+        if(cash > this.cash.value()) {
+            throw new IllegalArgumentException("The user doesn't have enough cash to buy the given crypto.");
+        }
+    }
+
+    public Message findMessageById(String messageId) {
+        return
+          this
+            .messages().stream()
+            .filter(msg -> msg.identity().value().equals(messageId))
+            .findFirst().orElseThrow(() ->
+                  new IllegalArgumentException("The message with the given ID doesn't exist in this user.")
+            );
+    }
+    public void validateSellTransaction(Double transactionCryptoAmount, String cryptoSymbol) {
+        Double userCryptoAmount = this.findCryptoAmountBySymbol(cryptoSymbol);
+
+        if(transactionCryptoAmount > userCryptoAmount) {
+            throw new IllegalArgumentException("The user doesn't have enough crypto to sell to the exchange.");
+        }
+    }
+
     public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
         super
                 .appendChange(

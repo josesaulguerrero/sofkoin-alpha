@@ -3,7 +3,7 @@ package co.com.sofkoin.alpha.infrastructure.web.controllers;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.application.usecases.FundWalletUseCase;
 import co.com.sofkoin.alpha.application.usecases.P2PTransactionUseCase;
-import co.com.sofkoin.alpha.application.usecases.TradeTransactionuseCase;
+import co.com.sofkoin.alpha.application.usecases.TradeTransactionUseCase;
 import co.com.sofkoin.alpha.domain.user.commands.CommitP2PTransaction;
 import co.com.sofkoin.alpha.domain.user.commands.CommitTradeTransaction;
 import co.com.sofkoin.alpha.domain.user.commands.FundWallet;
@@ -24,7 +24,7 @@ import javax.validation.Valid;
 public class TransactionController {
 
     P2PTransactionUseCase p2PTransactionUseCase;
-    TradeTransactionuseCase tradeTransactionuseCase;
+    TradeTransactionUseCase tradeTransactionuseCase;
     FundWalletUseCase fundWalletUseCase;
 
     @PostMapping("p2p")
