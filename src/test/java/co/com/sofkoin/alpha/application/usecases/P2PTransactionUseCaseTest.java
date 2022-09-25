@@ -46,8 +46,7 @@ class P2PTransactionUseCaseTest {
                 "ETH",
                 1.0,
                 1.0,
-                "SELL",
-                1.0
+                "SELL"
         );
 
         //events

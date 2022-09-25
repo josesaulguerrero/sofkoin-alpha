@@ -34,7 +34,7 @@ class DeleteP2POfferUseCaseTest {
 
     @Test
     void deleteP2POfferUseCaseTest(){
-        MarketCreated market = new MarketCreated("Colombia");
+        MarketCreated market = new MarketCreated("Colombia", "7841L08");
 
 
         P2POfferPublished offerEvent = new P2POfferPublished(
@@ -65,7 +65,5 @@ class DeleteP2POfferUseCaseTest {
         Mockito.verify(domainEventBus, Mockito.atLeastOnce()).publishEvent(Mockito.any(P2POfferDeleted.class));
 
     }
-
-
 
 }

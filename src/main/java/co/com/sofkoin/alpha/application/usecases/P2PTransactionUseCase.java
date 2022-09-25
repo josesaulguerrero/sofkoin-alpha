@@ -49,7 +49,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                     .map(events -> User.from(new UserID(userId), events))
                     .doOnNext(user -> {
                           if(TransactionTypes.BUY.equals(transactionType)) {
-                            user.validateBuyTransaction(command.getCash());
+                            user.validateBuyTransaction(command.getCryptoAmount() * command.getCryptoPrice());
 
                           } else if(TransactionTypes.SELL.equals(transactionType)) {
                             user.validateSellTransaction(command.getCryptoAmount(), command.getCryptoSymbol());
@@ -66,7 +66,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                                 new TransactionCryptoAmount(command.getCryptoAmount()),
                                 new TransactionCryptoPrice(command.getCryptoPrice()),
                                 transactionType.name(),
-                                new Cash(command.getCash()),
+                                new Cash(command.getCryptoAmount() * command.getCryptoPrice()),
                                 new Timestamp());
 
                         log.info(transactionType.name() + " transaction running for User: " + user);
