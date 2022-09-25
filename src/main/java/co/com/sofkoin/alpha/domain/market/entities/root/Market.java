@@ -64,8 +64,4 @@ public class Market extends AggregateEvent<MarketID> {
         super.appendChange(new P2POfferDeleted(offerId.value(), this.entityId.value())).apply();
     }
 
-    public Optional<Offer> getOfferByID(OfferId offerId){
-        return offers.stream().filter((offer -> offer.identity().equals(offerId))).findFirst();
-    }
-
 }

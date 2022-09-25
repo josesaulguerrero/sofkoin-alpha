@@ -40,7 +40,6 @@ class TradeTransactionUseCaseTest {
                 "BUY",
                 "ETH",
                 1.0,
-                1.0,
                 1.0
         );
 
