@@ -43,12 +43,7 @@ class P2PTransactionUseCaseTest {
         CommitP2PTransaction command = new CommitP2PTransaction(
                 "2",
                 "1",
-                "11K",
-                "784",
-                "ETH",
-                1.0,
-                1.0,
-                "SELL"
+                "11K"
         );
 
         //events

@@ -40,17 +40,17 @@ class TradeTransactionUseCaseTest {
                 "BUY",
                 "ETH",
                 1.0,
-                1.0
+                5.0
         );
 
         TradeTransactionCommitted event = new TradeTransactionCommitted(
                 "33333",
-                "1",
+                command.getBuyerId(),
                 "BUY",
-                "ETH",
-                1.0,
-                1.0,
-                1.0,
+                command.getCryptoSymbol(),
+                command.getCryptoAmount(),
+                command.getCryptoAmount(),
+                command.getCryptoAmount() * command.getCryptoPrice(),
                 new Timestamp().toString()
         );
         var user = new UserSignedUp(

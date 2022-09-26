@@ -159,7 +159,7 @@ public class UserEventListener extends EventChange {
 
     private static void offerMessageSaved(OfferMessageSaved event, User user) {
         Message message = new Message(
-                new MessageID(),
+                new MessageID(event.getMessageId()),
                 new MarketID(event.getMarketId()),
                 new ProposalCryptoAmount(event.getCryptoAmount()),
                 new ProposalCryptoPrice(event.getCryptoPrice()),

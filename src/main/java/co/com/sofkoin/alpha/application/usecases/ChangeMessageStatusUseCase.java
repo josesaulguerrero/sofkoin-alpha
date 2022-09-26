@@ -47,7 +47,7 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> 
                 .map(events -> User.from(new UserID(userId), events))
                 .map(user -> {
                     MessageStatus messageStatus = MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim());
-                    if (messageStatus.equals(MessageStatus.ACCEPTED)) {
+                    if (messageStatus.equals(MessageStatus.ACCEPTED) && user.identity().value().equals(command.getReceiverId())) {
                         Message message = user.findMessageById(command.getMessageId());
                         Double cryptoAmountBySymbol =
                                 user.findCryptoAmountBySymbol(message.cryptoSymbol().value());
@@ -58,6 +58,10 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> 
                 })
                 .flatMapIterable(user -> {
                     Message message = user.findMessageById(command.getMessageId());
+
+                    if (message.messageStatus().equals(MessageStatus.ACCEPTED) || message.messageStatus().equals(MessageStatus.REJECTED)) {
+                        throw new IllegalArgumentException("The message status already changed; you cannot update it anymore.");
+                    }
 
                     user.changeMessageStatus(
                             new UserID(command.getReceiverId()),

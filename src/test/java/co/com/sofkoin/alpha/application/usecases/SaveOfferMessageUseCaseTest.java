@@ -7,6 +7,7 @@ import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.events.OfferMessageSaved;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
+import co.com.sofkoin.alpha.domain.user.values.MessageRelationTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -33,12 +34,25 @@ class SaveOfferMessageUseCaseTest {
     @Test
     void saveOfferMessageUseCaseTest(){
 
-        var command = new SaveOfferMessage("31232", "1", "2",
-                "BTC", 0.11, 19117.11);
+        var command = new SaveOfferMessage(
+                "31232",
+                "1",
+                "2",
+                "BTC",
+                0.11,
+                19117.11
+        );
 
-        var domainEvent = new OfferMessageSaved("17K11", command.getMarketId(), command.getSenderId(),
-                command.getReceiverId(), command.getCryptoSymbol(),
-                command.getCryptoAmount(), command.getCryptoPrice());
+        var domainEvent = new OfferMessageSaved(
+                "17K11",
+                command.getMarketId(),
+                command.getSenderId(),
+                command.getReceiverId(),
+                command.getCryptoSymbol(),
+                MessageRelationTypes.RECEIVER.name(),
+                command.getCryptoAmount(),
+                command.getCryptoPrice()
+        );
 
         var receiverSignedUp = new UserSignedUp(command.getReceiverId(),
                 "stephany@email.com",

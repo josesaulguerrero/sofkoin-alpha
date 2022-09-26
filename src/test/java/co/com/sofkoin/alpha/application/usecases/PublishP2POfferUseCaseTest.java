@@ -3,9 +3,15 @@ package co.com.sofkoin.alpha.application.usecases;
 import co.com.sofka.domain.generic.DomainEvent;
 import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
+import co.com.sofkoin.alpha.domain.market.commands.CreateMarket;
 import co.com.sofkoin.alpha.domain.market.commands.PublishP2POffer;
 import co.com.sofkoin.alpha.domain.market.events.MarketCreated;
 import co.com.sofkoin.alpha.domain.market.events.P2POfferPublished;
+import co.com.sofkoin.alpha.domain.user.events.TradeTransactionCommitted;
+import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
+import co.com.sofkoin.alpha.domain.user.events.WalletFunded;
+import co.com.sofkoin.alpha.domain.user.values.Timestamp;
+import co.com.sofkoin.alpha.domain.user.values.TransactionTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +23,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.lang.management.MonitorInfo;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
@@ -36,33 +43,69 @@ class PublishP2POfferUseCaseTest {
 
     @Test
     void publishP2POfferUseCaseTest() {
-        MarketCreated market = new MarketCreated("Colombia", "23812");
-        market.setAggregateRootId("5498vfcd");
-        PublishP2POffer offer = new PublishP2POffer(
-                "5498vfcd",
-                "edfanon303",
-                "11KM11T",
+        UserSignedUp userSignedUpEvent = new UserSignedUp(
+                "1",
+                "maxmusterman@daad.de",
+                "maxmusterman@daad.de",
+                "Max",
+                "Musterman",
+                "0123456789",
+                "http://www.acatar.url.com",
+                "GMAIL"
+        );
+
+        WalletFunded walletFunded = new WalletFunded(
+                userSignedUpEvent.getUserId(),
+                100.0,
+                new Timestamp().toString()
+        );
+
+        TradeTransactionCommitted tradeTransactionCommittedEvent = new TradeTransactionCommitted(
+                UUID.randomUUID().toString(),
+                userSignedUpEvent.getUserId(),
+                TransactionTypes.BUY.name(),
+                "XRP",
+                60.0,
+                20.0,
+                1200.0,
+                new Timestamp().toString()
+        );
+
+        MarketCreated marketCreatedEvent = new MarketCreated(
+                "Colombia",
+                "23812"
+        );
+
+        PublishP2POffer createOffer = new PublishP2POffer(
+                marketCreatedEvent.getMarketId(),
+                userSignedUpEvent.getUserId(),
+                "-",
                 "XRP",
                 57.4,
-                50.5);
+                50.5
+        );
 
         P2POfferPublished offerEvent = new P2POfferPublished(
-                "151fdea",
-                "kat11Kmi",
-                "edfanon303",
-                "XRP",
-                57.4,
-                50.5,
-                "1fsvibreuiw");
-        offerEvent.setAggregateParentId("5498vfcd");
+                UUID.randomUUID().toString(),
+                createOffer.getMarketId(),
+                createOffer.getPublisherId(),
+                createOffer.getCryptoSymbol(),
+                createOffer.getOfferCryptoAmount(),
+                createOffer.getOfferCryptoPrice(),
+                createOffer.getTargetAudienceId()
+        );
 
+        Mockito
+                .when(domainEventRepository.findByAggregateRootId(createOffer.getMarketId()))
+                .thenReturn(Flux.just(marketCreatedEvent));
+        Mockito
+                .when(domainEventRepository.findByAggregateRootId(createOffer.getPublisherId()))
+                .thenReturn(Flux.just(userSignedUpEvent, walletFunded, tradeTransactionCommittedEvent));
+        Mockito
+                .when(domainEventRepository.saveDomainEvent(Mockito.any(P2POfferPublished.class)))
+                .thenReturn(Mono.just(offerEvent));
 
-        Mockito.when(domainEventRepository.findByAggregateRootId(Mockito.any(String.class))).thenReturn(Flux.just(market));
-        Mockito.when(domainEventRepository.saveDomainEvent(Mockito.any(P2POfferPublished.class))).thenReturn(Mono.just(offerEvent));
-
-        var use = (Flux<DomainEvent>)publishP2POfferUseCase.apply(Mono.just(offer));
-
-        StepVerifier.create(use)
+        StepVerifier.create(publishP2POfferUseCase.apply(Mono.just(createOffer)))
                 .expectNext(offerEvent)
                 .verifyComplete();
 
