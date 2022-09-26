@@ -9,6 +9,7 @@ import co.com.sofkoin.alpha.domain.common.values.identities.UserID;
 import co.com.sofkoin.alpha.domain.market.values.identities.MarketID;
 import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
+import co.com.sofkoin.alpha.domain.user.values.MessageRelationTypes;
 import co.com.sofkoin.alpha.domain.user.values.TransactionCryptoAmount;
 import co.com.sofkoin.alpha.domain.user.values.TransactionCryptoPrice;
 import co.com.sofkoin.alpha.domain.user.values.identities.MessageID;
@@ -29,48 +30,50 @@ public class SaveOfferMessageUseCase implements UseCase<SaveOfferMessage> {
 
         MessageID messageId = new MessageID();
         Flux<DomainEvent> receiverFLux = saveOfferMessageCommand
-                .flatMapMany(command -> applyCommandToUserById(command, command.getReceiverId(), messageId));
+                .flatMapMany(command -> applyCommandToUserById(command, command.getReceiverId(), messageId, MessageRelationTypes.RECEIVER));
         Flux<DomainEvent> senderFLux = saveOfferMessageCommand
-                .flatMapMany(command -> applyCommandToUserById(command, command.getSenderId(), messageId));
+                .flatMapMany(command -> applyCommandToUserById(command, command.getSenderId(), messageId, MessageRelationTypes.SENDER));
         return Flux.merge(receiverFLux, senderFLux);
     }
 
-    private Flux<DomainEvent> applyCommandToUserById(SaveOfferMessage command, String userId, MessageID messageId){
+    private Flux<DomainEvent> applyCommandToUserById(SaveOfferMessage command, String userId, MessageID messageId, MessageRelationTypes messageRelationType) {
 
         return repository.findByAggregateRootId(userId)
                 .switchIfEmpty(Mono.defer(() ->
                         Mono.error(new IllegalArgumentException("User id: " + command.getReceiverId() + " not found.")))
                 )
                 .collectList()
-                .map(events -> User.from(new UserID(userId), events))
-                .doOnNext(user -> {
-                    if(command.getReceiverId().equals(userId)) {
+                .map(events ->  User.from(new UserID(userId), events))
+                .map(user -> {
+                    if (command.getReceiverId().equals(userId)) {
                         this.validateReceiverCryptos(
                                 command.getCryptoAmount(),
                                 user.findCryptoAmountBySymbol(command.getCryptoSymbol())
                         );
                     }
+                    return user;
                 })
                 .flatMapIterable(user -> {
-                    user.saveOfferMessage(messageId,
+                    user.saveOfferMessage(
+                            messageId,
                             new MarketID(command.getMarketId()),
                             new UserID(command.getSenderId()),
-                            new UserID(command.getReceiverId()), new CryptoSymbol(command.getCryptoSymbol()),
+                            new UserID(command.getReceiverId()),
+                            new CryptoSymbol(command.getCryptoSymbol()),
+                            messageRelationType,
                             new TransactionCryptoAmount(command.getCryptoAmount()),
-                            new TransactionCryptoPrice(command.getCryptoPrice()));
+                            new TransactionCryptoPrice(command.getCryptoPrice())
+                    );
                     return user.getUncommittedChanges();
-                }).flatMap(event -> {
-                    bus.publishEvent(event);
-                    return repository.saveDomainEvent(event).thenReturn(event);
-                });
+                })
+                .flatMap(this.repository::saveDomainEvent)
+                .doOnNext(this.bus::publishEvent);
     }
 
     private void validateReceiverCryptos(Double proposalCryptoAmount, Double userAvailableCryptoAmount) {
-        if(proposalCryptoAmount > userAvailableCryptoAmount) {
+        if (proposalCryptoAmount > userAvailableCryptoAmount) {
             throw new IllegalArgumentException("The receiver doesn't have enough cryptos, you can't send the offer message.");
         }
     }
 
 }
-
-

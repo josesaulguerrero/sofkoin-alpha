@@ -14,6 +14,8 @@ public class OfferMessageSaved extends DomainEvent {
     private String senderId;
     private String receiverId;
     private String cryptoSymbol;
+
+    private String messageRelationType;
     private Double cryptoAmount;
     private Double cryptoPrice;
 
@@ -21,12 +23,13 @@ public class OfferMessageSaved extends DomainEvent {
         super(OfferMessageSaved.class.getName());
     }
 
-    public OfferMessageSaved(String messageId, String marketId, String senderId, String receiverId, String cryptoSymbol, Double cryptoAmount, Double cryptoPrice) {
+    public OfferMessageSaved(String messageId, String marketId, String senderId, String receiverId, String cryptoSymbol, String messageRelationType, Double cryptoAmount, Double cryptoPrice) {
         super(OfferMessageSaved.class.getName());
         this.marketId = marketId;
         this.messageId = messageId;
         this.senderId = senderId;
         this.receiverId = receiverId;
+        this.messageRelationType = messageRelationType;
         this.cryptoSymbol = cryptoSymbol;
         this.cryptoAmount = cryptoAmount;
         this.cryptoPrice = cryptoPrice;

@@ -10,11 +10,9 @@ import co.com.sofkoin.alpha.domain.user.commands.LogIn;
 import co.com.sofkoin.alpha.domain.user.entities.root.User;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
 import co.com.sofkoin.alpha.domain.user.values.Email;
-import co.com.sofkoin.alpha.domain.user.values.Password;
 import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import co.com.sofkoin.alpha.infrastructure.config.security.jwt.JWTProvider;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,6 +49,9 @@ public class LogInUseCase implements UseCase<LogIn> {
                                                                     new UserID(((UserSignedUp) events.get(0)).getUserId()),
                                                                     events
                                                             );
+                                                            if (!user.authMethod().name().equals(com.getAuthMethod())) {
+                                                                throw new IllegalArgumentException("You cannot log in with a different auth method than you registered with.");
+                                                            }
                                                             user.logIn(
                                                                     new UserID(user.identity().value()),
                                                                     new Email(com.getEmail()),

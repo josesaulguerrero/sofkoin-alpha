@@ -22,77 +22,84 @@ import java.util.Locale;
 @AllArgsConstructor
 public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> {
 
-  private final DomainEventBus bus;
-  private final DomainEventRepository repository;
-  private final PublishP2POfferUseCase publishP2POfferUseCase;
+    private final DomainEventBus bus;
+    private final DomainEventRepository repository;
+    private final PublishP2POfferUseCase publishP2POfferUseCase;
 
-  @Override
-  public Flux<DomainEvent> apply(Mono<ChangeMessageStatus> changeMessageStatusCommand) {
+    @Override
+    public Flux<DomainEvent> apply(Mono<ChangeMessageStatus> changeMessageStatusCommand) {
 
-    Flux<DomainEvent> receiverFLux = changeMessageStatusCommand
-            .flatMapMany(command -> applyCommandToUserById(command, command.getReceiverId()));
-    Flux<DomainEvent> senderFLux = changeMessageStatusCommand
-            .flatMapMany(command -> applyCommandToUserById(command, command.getSenderId()));
+        Flux<DomainEvent> receiverFLux = changeMessageStatusCommand
+                .flatMapMany(command -> applyCommandToUserById(command, command.getReceiverId()));
+        Flux<DomainEvent> senderFLux = changeMessageStatusCommand
+                .flatMapMany(command -> applyCommandToUserById(command, command.getSenderId()));
 
-    return Flux.merge(receiverFLux, senderFLux);
-  }
+        return Flux.merge(receiverFLux, senderFLux);
+    }
 
-  private Flux<DomainEvent> applyCommandToUserById(ChangeMessageStatus command, String userId) {
+    private Flux<DomainEvent> applyCommandToUserById(ChangeMessageStatus command, String userId) {
 
-    return repository.findByAggregateRootId(userId)
-            .switchIfEmpty(Mono.defer(() ->
-                    Mono.error(new IllegalArgumentException("User id: " + command.getReceiverId() + " not found.")))
-            )
-            .collectList()
-            .map(events -> User.from(new UserID(userId), events))
-            .map(user -> {
-              MessageStatus messageStatus = MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim());
-              if (messageStatus.equals(MessageStatus.ACCEPTED)) {
-                Message message = user.findMessageById(command.getMessageId());
-                Double cryptoAmountBySymbol =
-                        user.findCryptoAmountBySymbol(message.cryptoSymbol().value());
+        return repository.findByAggregateRootId(userId)
+                .switchIfEmpty(Mono.defer(() ->
+                        Mono.error(new IllegalArgumentException("User id: " + command.getReceiverId() + " not found.")))
+                )
+                .collectList()
+                .map(events -> User.from(new UserID(userId), events))
+                .map(user -> {
+                    MessageStatus messageStatus = MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim());
+                    if (messageStatus.equals(MessageStatus.ACCEPTED)) {
+                        Message message = user.findMessageById(command.getMessageId());
+                        Double cryptoAmountBySymbol =
+                                user.findCryptoAmountBySymbol(message.cryptoSymbol().value());
+                        validateReceiverCryptoAmount(user, message.identity().value(), cryptoAmountBySymbol);
+                    }
 
-                validateReceiverCryptoAmount(message, cryptoAmountBySymbol);
-              }
+                    return user;
+                })
+                .flatMapIterable(user -> {
+                    user.changeMessageStatus(
+                            new UserID(command.getReceiverId()),
+                            new UserID(command.getSenderId()),
+                            new MessageID(command.getMessageId()),
+                            MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim())
+                    );
 
-              return user;
-            })
-            .flatMapIterable(user -> {
-              user.changeMessageStatus(
-                      new UserID(command.getReceiverId()),
-                      new UserID(command.getSenderId()),
-                      new MessageID(command.getMessageId()),
-                      MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim())
-              );
+                    Message message = user.findMessageById(command.getMessageId());
 
-              Message message = user.findMessageById(command.getMessageId());
+                    if (user.identity().value().equals(message.receiverId().value()) && command.getNewStatus().equals(MessageStatus.ACCEPTED.name())) {
+                        PublishP2POffer publishP2POffer = new PublishP2POffer(
+                                message.marketID().value(),
+                                command.getReceiverId(),
+                                command.getSenderId(),
+                                message.cryptoSymbol().value(),
+                                message.proposalCryptoAmount().value(),
+                                message.proposalCryptoPrice().value()
+                        );
+                        publishP2POfferUseCase.apply(Mono.just(publishP2POffer)).subscribe();
+                    }
+                    return user.getUncommittedChanges();
+                })
+                .flatMap(this.repository::saveDomainEvent)
+                .doOnNext(this.bus::publishEvent);
+    }
 
-              if (user.identity().value().equals(message.receiverId().value()) && command.getNewStatus().equals(MessageStatus.ACCEPTED.name())) {
-                PublishP2POffer publishP2POffer = new PublishP2POffer(
-                        message.marketID().value(),
-                        command.getReceiverId(),
-                        command.getSenderId(),
-                        message.cryptoSymbol().value(),
-                        message.proposalCryptoAmount().value(),
-                        message.proposalCryptoPrice().value()
-                );
-                publishP2POfferUseCase.apply(Mono.just(publishP2POffer)).subscribe();
-              }
-              return user.getUncommittedChanges();
-            }).flatMap(event -> {
-              bus.publishEvent(event);
-              return repository.saveDomainEvent(event).thenReturn(event);
-            });
-  }
-
-    private void validateReceiverCryptoAmount(Message message, Double cryptoAmountBySymbol) {
+    private void validateReceiverCryptoAmount(User user, String messageId, Double cryptoAmountBySymbol) {
+        Message message = user.findMessageById(messageId);
         if (message.proposalCryptoAmount().value() > cryptoAmountBySymbol) {
-          throw new IllegalArgumentException(
-                  String.format(
-                          "You don't have the enough amount of %s to accept this proposal."
-                          , message.cryptoSymbol().value()
-                  ));
+            this.rejectOfferMessage(user, message);
+            throw new IllegalArgumentException(
+                    String.format(
+                            "You don't have the enough amount of %s to accept this proposal.",
+                            message.cryptoSymbol().value()
+                    ));
         }
     }
 
+    private void rejectOfferMessage(User user, Message message) {
+        user.changeMessageStatus(message.receiverId(), message.senderId(), message.identity(), MessageStatus.REJECTED);
+        Mono.just(user.getUncommittedChanges())
+                .flatMapIterable(events -> events)
+                .flatMap(this.repository::saveDomainEvent)
+                .doOnNext(this.bus::publishEvent);
+    }
 }

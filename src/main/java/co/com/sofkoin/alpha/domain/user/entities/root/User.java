@@ -209,6 +209,7 @@ public class User extends AggregateEvent<UserID> {
                                  UserID senderId,
                                  UserID receiverId,
                                  CryptoSymbol cryptoSymbol,
+                                 MessageRelationTypes messageRelationTypes,
                                  TransactionCryptoAmount cryptoAmount,
                                  TransactionCryptoPrice cryptoPrice
     ) {
@@ -220,6 +221,7 @@ public class User extends AggregateEvent<UserID> {
                                 senderId.value(),
                                 receiverId.value(),
                                 cryptoSymbol.value(),
+                                messageRelationTypes.name(),
                                 cryptoAmount.value(),
                                 cryptoPrice.value()
                         )

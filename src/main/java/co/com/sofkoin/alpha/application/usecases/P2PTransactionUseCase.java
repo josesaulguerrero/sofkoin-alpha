@@ -47,10 +47,17 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                             .flatMapMany(market -> {
                                 Offer offerToDelete = market.findOfferById(command.getOfferId());
 
+                                if (
+                                        !command.getBuyerId().equals(offerToDelete.targetAudienceId().value())
+                                        && !offerToDelete.targetAudienceId().value().equals("-")
+                                ) {
+                                    throw new IllegalArgumentException("You cannot commit this transaction; it is not directed to you.");
+                                }
+
                                 var buyerFlux =
-                                        P2PTransaction(command, command.getBuyerId(), TransactionTypes.BUY);
+                                        P2PTransaction(command, command.getBuyerId(), TransactionTypes.BUY, offerToDelete);
                                 var sellerFlux =
-                                        P2PTransaction(command, command.getSellerId(), TransactionTypes.SELL);
+                                        P2PTransaction(command, offerToDelete.publisherId().value(), TransactionTypes.SELL, offerToDelete);
 
                                 DeleteP2POffer deleteP2POfferCommand =
                                         new DeleteP2POffer(market.identity().value(), offerToDelete.identity().value());
@@ -60,8 +67,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                 });
     }
 
-    private Flux<DomainEvent> P2PTransaction(CommitP2PTransaction command,
-                                             String userId, TransactionTypes transactionType) {
+    private Flux<DomainEvent> P2PTransaction(CommitP2PTransaction command, String userId, TransactionTypes transactionType, Offer offer) {
 
         return repository.findByAggregateRootId(userId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("The user with the given Id does not exist.")))
@@ -69,10 +75,10 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                 .map(events -> User.from(new UserID(userId), events))
                 .map(user -> {
                     if (TransactionTypes.BUY.equals(transactionType)) {
-                        user.validateBuyTransaction(command.getCryptoAmount() * command.getCryptoPrice());
+                        user.validateBuyTransaction(offer.cryptoAmount().value() * offer.cryptoPrice().value());
 
                     } else if (TransactionTypes.SELL.equals(transactionType)) {
-                        user.validateSellTransaction(command.getCryptoAmount(), command.getCryptoSymbol());
+                        user.validateSellTransaction(offer.cryptoAmount().value(), offer.cryptoSymbol().value());
 
                     } else throw new IllegalArgumentException("The given transaction type is not allowed.");
 
@@ -80,24 +86,25 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
                 })
                 .flatMapIterable(user -> {
 
-                    user.commitP2PTransaction(new TransactionID(),
-                            new UserID(command.getSellerId()),
+                    user.commitP2PTransaction(
+                            new TransactionID(),
+                            new UserID(offer.publisherId().value()),
                             new UserID(command.getBuyerId()),
                             new OfferId(command.getOfferId()),
                             new MarketID(command.getMarketId()),
-                            new CryptoSymbol(command.getCryptoSymbol()),
-                            new TransactionCryptoAmount(command.getCryptoAmount()),
-                            new TransactionCryptoPrice(command.getCryptoPrice()),
+                            new CryptoSymbol(offer.cryptoSymbol().value()),
+                            new TransactionCryptoAmount(offer.cryptoAmount().value()),
+                            new TransactionCryptoPrice(offer.cryptoPrice().value()),
                             transactionType.name(),
-                            new Cash(command.getCryptoAmount() * command.getCryptoPrice()),
-                            new Timestamp());
+                            new Cash(offer.cryptoAmount().value() * offer.cryptoPrice().value()),
+                            new Timestamp()
+                    );
 
                     log.info(transactionType.name() + " transaction running for User: " + user);
                     return user.getUncommittedChanges();
-                }).map(domainEvent -> {
-                    bus.publishEvent(domainEvent);
-                    return domainEvent;
-                }).flatMap(repository::saveDomainEvent);
+                })
+                .flatMap(repository::saveDomainEvent)
+                .doOnNext(bus::publishEvent);
 
     }
 

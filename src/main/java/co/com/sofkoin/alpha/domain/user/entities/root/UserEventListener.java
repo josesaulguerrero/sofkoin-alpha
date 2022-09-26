@@ -166,6 +166,7 @@ public class UserEventListener extends EventChange {
                 MessageStatus.PENDING,
                 new UserID(event.getSenderId()),
                 new UserID(event.getReceiverId()),
+                MessageRelationTypes.valueOf(event.getMessageRelationType().toUpperCase(Locale.ROOT).trim()),
                 new CryptoSymbol(event.getCryptoSymbol())
         );
         user.messages.add(message);
