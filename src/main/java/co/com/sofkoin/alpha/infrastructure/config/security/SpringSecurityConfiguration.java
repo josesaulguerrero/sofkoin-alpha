@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
@@ -58,6 +59,7 @@ public class SpringSecurityConfiguration {
                 email ->
                         userRepository
                                 .findUserDomainEventsByEmail(email)
+                                .switchIfEmpty(Mono.error(new IllegalArgumentException("There's no user registered with this email.")))
                                 .collectList()
                                 .map(events -> {
                                     var user = co.com.sofkoin.alpha.domain.user.entities.root.User.from(
