@@ -7,10 +7,13 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.ChangeMessageStatus;
 import co.com.sofkoin.alpha.domain.user.events.MessageStatusChanged;
 import co.com.sofkoin.alpha.domain.user.events.OfferMessageSaved;
+import co.com.sofkoin.alpha.domain.user.events.TradeTransactionCommitted;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
+import co.com.sofkoin.alpha.domain.user.events.WalletFunded;
 import co.com.sofkoin.alpha.domain.user.values.MessageRelationTypes;
 import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
+import co.com.sofkoin.alpha.domain.user.values.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -87,11 +90,35 @@ class ChangeMessageStatusUseCaseTest {
                 AuthMethod.MANUAL.name()
         );
 
+
+        var walletFundedReceiver = new WalletFunded(
+                messageSaved.getReceiverId(),
+                100000.0,
+                new Timestamp().toString()
+        );
+
+        var walletFundedSender = new WalletFunded(
+                messageSaved.getSenderId(),
+                100000.0,
+                new Timestamp().toString()
+        );
+
+        var receiverBuyCoin = new TradeTransactionCommitted(
+                "11",
+                messageSaved.getReceiverId(),
+                "BUY",
+                "BTC",
+                1.0,
+                19500.0,
+                19500.0,
+                new Timestamp().toString()
+        );
+
         BDDMockito.when(repositoryMock.findByAggregateRootId(command.getReceiverId()))
-                .thenReturn(Flux.just(receiverSignedUp, messageSaved));
+                .thenReturn(Flux.just(receiverSignedUp, messageSaved, walletFundedReceiver, receiverBuyCoin));
 
         BDDMockito.when(repositoryMock.findByAggregateRootId(command.getSenderId()))
-                .thenReturn(Flux.just(senderSignedUp, messageSaved));
+                .thenReturn(Flux.just(senderSignedUp, messageSaved, walletFundedSender));
 
         BDDMockito.when(publishP2POfferUseCase.apply(BDDMockito.any())).thenReturn(Flux.empty());
 
