@@ -69,6 +69,10 @@ public class Message extends Entity<MessageID> {
         return receiverId;
     }
 
+    public MessageRelationTypes messageRelationType() {
+        return messageRelationType;
+    }
+
     public CryptoSymbol cryptoSymbol() {
         return cryptoSymbol;
     }

@@ -111,13 +111,20 @@ public class User extends AggregateEvent<UserID> {
         }
     }
 
-    public void changeMessageStatus(UserID receiverId, UserID senderId, MessageID messageId, MessageStatus newStatus) {
+    public void changeMessageStatus(
+            UserID receiverId,
+            UserID senderId,
+            MessageID messageId,
+            MessageRelationTypes messageRelationType,
+            MessageStatus newStatus
+    ) {
         super
                 .appendChange(
                         new MessageStatusChanged(
                                 receiverId.value(),
                                 senderId.value(),
                                 messageId.value(),
+                                messageRelationType.name(),
                                 newStatus.name()
                         )
                 )

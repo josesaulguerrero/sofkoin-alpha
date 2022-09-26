@@ -57,14 +57,15 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> 
                     return user;
                 })
                 .flatMapIterable(user -> {
+                    Message message = user.findMessageById(command.getMessageId());
+
                     user.changeMessageStatus(
                             new UserID(command.getReceiverId()),
                             new UserID(command.getSenderId()),
                             new MessageID(command.getMessageId()),
+                            message.messageRelationType(),
                             MessageStatus.valueOf(command.getNewStatus().toUpperCase(Locale.ROOT).trim())
                     );
-
-                    Message message = user.findMessageById(command.getMessageId());
 
                     if (user.identity().value().equals(message.receiverId().value()) && command.getNewStatus().equals(MessageStatus.ACCEPTED.name())) {
                         PublishP2POffer publishP2POffer = new PublishP2POffer(
@@ -96,7 +97,13 @@ public class ChangeMessageStatusUseCase implements UseCase<ChangeMessageStatus> 
     }
 
     private void rejectOfferMessage(User user, Message message) {
-        user.changeMessageStatus(message.receiverId(), message.senderId(), message.identity(), MessageStatus.REJECTED);
+        user.changeMessageStatus(
+                message.receiverId(),
+                message.senderId(),
+                message.identity(),
+                message.messageRelationType(),
+                MessageStatus.REJECTED
+        );
         Mono.just(user.getUncommittedChanges())
                 .flatMapIterable(events -> events)
                 .flatMap(this.repository::saveDomainEvent)

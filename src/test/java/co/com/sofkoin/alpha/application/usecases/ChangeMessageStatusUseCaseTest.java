@@ -8,6 +8,7 @@ import co.com.sofkoin.alpha.domain.user.commands.ChangeMessageStatus;
 import co.com.sofkoin.alpha.domain.user.events.MessageStatusChanged;
 import co.com.sofkoin.alpha.domain.user.events.OfferMessageSaved;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
+import co.com.sofkoin.alpha.domain.user.values.MessageRelationTypes;
 import co.com.sofkoin.alpha.domain.user.values.MessageStatus;
 import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import org.junit.jupiter.api.Test;
@@ -40,14 +41,31 @@ class ChangeMessageStatusUseCaseTest {
     @Test
     void changeMessageStatusUseCaseTest() {
 
-        var messageSaved = new OfferMessageSaved("175K", "2131", "2", "1", "BTC",
-                0.05,19500.05);
+        var messageSaved = new OfferMessageSaved(
+                "175K",
+                "2131",
+                "2",
+                "1",
+                "BTC",
+                MessageRelationTypes.RECEIVER.name(),
+                0.05,
+                19500.05
+        );
 
-        var command = new ChangeMessageStatus("1", "2",
-                messageSaved.getMessageId(), MessageStatus.ACCEPTED.name());
+        var command = new ChangeMessageStatus(
+                "1",
+                "2",
+                messageSaved.getMessageId(),
+                MessageStatus.ACCEPTED.name()
+        );
 
-        var domainEvent = new MessageStatusChanged(command.getReceiverId(), command.getSenderId(),
-                command.getMessageId(), command.getNewStatus());
+        var domainEvent = new MessageStatusChanged(
+                command.getReceiverId(),
+                command.getSenderId(),
+                command.getMessageId(),
+                MessageRelationTypes.RECEIVER.name(),
+                command.getNewStatus()
+        );
 
         var receiverSignedUp = new UserSignedUp(command.getReceiverId(),
                 "stephany@email.com",
