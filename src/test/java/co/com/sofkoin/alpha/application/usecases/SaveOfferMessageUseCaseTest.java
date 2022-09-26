@@ -5,9 +5,13 @@ import co.com.sofkoin.alpha.application.gateways.DomainEventBus;
 import co.com.sofkoin.alpha.application.gateways.DomainEventRepository;
 import co.com.sofkoin.alpha.domain.user.commands.SaveOfferMessage;
 import co.com.sofkoin.alpha.domain.user.events.OfferMessageSaved;
+import co.com.sofkoin.alpha.domain.user.events.TradeTransactionCommitted;
 import co.com.sofkoin.alpha.domain.user.events.UserSignedUp;
+import co.com.sofkoin.alpha.domain.user.events.WalletFunded;
 import co.com.sofkoin.alpha.domain.user.values.AuthMethod;
 import co.com.sofkoin.alpha.domain.user.values.MessageRelationTypes;
+import co.com.sofkoin.alpha.domain.user.values.Timestamp;
+import co.com.sofkoin.alpha.domain.user.values.TransactionTypes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -18,6 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class SaveOfferMessageUseCaseTest {
@@ -34,7 +40,7 @@ class SaveOfferMessageUseCaseTest {
     @Test
     void saveOfferMessageUseCaseTest(){
 
-        var command = new SaveOfferMessage(
+        var saveOfferMessage = new SaveOfferMessage(
                 "31232",
                 "1",
                 "2",
@@ -43,18 +49,18 @@ class SaveOfferMessageUseCaseTest {
                 19117.11
         );
 
-        var domainEvent = new OfferMessageSaved(
-                "17K11",
-                command.getMarketId(),
-                command.getSenderId(),
-                command.getReceiverId(),
-                command.getCryptoSymbol(),
+        var offerMessageSaved = new OfferMessageSaved(
+                UUID.randomUUID().toString(),
+                saveOfferMessage.getMarketId(),
+                saveOfferMessage.getSenderId(),
+                saveOfferMessage.getReceiverId(),
+                saveOfferMessage.getCryptoSymbol(),
                 MessageRelationTypes.RECEIVER.name(),
-                command.getCryptoAmount(),
-                command.getCryptoPrice()
+                saveOfferMessage.getCryptoAmount(),
+                saveOfferMessage.getCryptoPrice()
         );
 
-        var receiverSignedUp = new UserSignedUp(command.getReceiverId(),
+        var receiverSignedUp = new UserSignedUp(saveOfferMessage.getReceiverId(),
                 "stephany@email.com",
                 "Test123ABC",
                 "Stephany",
@@ -64,7 +70,24 @@ class SaveOfferMessageUseCaseTest {
                 AuthMethod.MANUAL.name()
         );
 
-        var senderSignedUp = new UserSignedUp(command.getSenderId(),
+        WalletFunded walletFunded = new WalletFunded(
+                receiverSignedUp.getUserId(),
+                100000.0,
+                new Timestamp().toString()
+        );
+
+        TradeTransactionCommitted tradeTransactionCommitted = new TradeTransactionCommitted(
+                UUID.randomUUID().toString(),
+                receiverSignedUp.getUserId(),
+                TransactionTypes.BUY.name(),
+                "BTC",
+                3.0,
+                15000.0,
+                45000.0,
+                new Timestamp().toString()
+        );
+
+        var senderSignedUp = new UserSignedUp(saveOfferMessage.getSenderId(),
                 "katerin@email.com",
                 "Test789ABC",
                 "Katerin",
@@ -74,16 +97,16 @@ class SaveOfferMessageUseCaseTest {
                 AuthMethod.MANUAL.name()
         );
 
-        BDDMockito.when(repositoryMock.findByAggregateRootId(command.getReceiverId()))
-                .thenReturn(Flux.just(receiverSignedUp));
+        BDDMockito.when(repositoryMock.findByAggregateRootId(saveOfferMessage.getReceiverId()))
+                .thenReturn(Flux.just(receiverSignedUp, walletFunded, tradeTransactionCommitted));
 
-        BDDMockito.when(repositoryMock.findByAggregateRootId(command.getSenderId()))
+        BDDMockito.when(repositoryMock.findByAggregateRootId(saveOfferMessage.getSenderId()))
                 .thenReturn(Flux.just(senderSignedUp));
 
         BDDMockito.when(repositoryMock.saveDomainEvent(Mockito.any(DomainEvent.class)))
-                .thenReturn(Mono.just(domainEvent));
+                .thenReturn(Mono.just(offerMessageSaved));
 
-        var useCase = saveOfferMessageUseCase.apply(Mono.just(command));
+        var useCase = saveOfferMessageUseCase.apply(Mono.just(saveOfferMessage));
 
         StepVerifier.create(useCase)
                 .expectSubscription()
@@ -99,7 +122,6 @@ class SaveOfferMessageUseCaseTest {
 
         BDDMockito.verify(repositoryMock, BDDMockito.times(2))
                 .findByAggregateRootId(Mockito.any(String.class));
-
 
     }
 
