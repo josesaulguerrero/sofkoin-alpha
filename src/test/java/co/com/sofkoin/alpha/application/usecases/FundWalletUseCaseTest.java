@@ -49,7 +49,7 @@ class FundWalletUseCaseTest {
         );
         newUser.setAggregateRootId("1");
 
-        var walletFunded = new WalletFunded("1",1000000D, "09/21/2922 04:24:32");
+        var walletFunded = new WalletFunded("1",100000.0, "09/21/2922 04:24:32");
         walletFunded.setAggregateRootId("1");
 
         var command = new FundWallet(walletFunded.getUserId(),walletFunded.getCashAmount());
