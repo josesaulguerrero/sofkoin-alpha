@@ -28,20 +28,26 @@ public class FundWalletUseCase implements UseCase<FundWallet> {
 
     @Override
     public Flux<DomainEvent> apply(Mono<FundWallet> commandMono) {
-        return commandMono.flatMapMany(command -> repository.findByAggregateRootId(command.getUserId())
-                .collectList()
-                .flatMapIterable(domainEvents -> {
+        return commandMono.flatMapMany(command -> {
+                if(command.getCashAmount() > 100000.0) {
+                  throw new IllegalArgumentException("You cannot fund more than 100.000 dollars.");
+                }
+
+                return repository.findByAggregateRootId(command.getUserId())
+                  .collectList()
+                  .flatMapIterable(domainEvents -> {
                     var userID = new UserID(command.getUserId());
                     User user = User.from(userID, domainEvents);
                     user.fundWallet(userID, new Cash(command.getCashAmount()), new Timestamp());
                     return user.getUncommittedChanges();
-                })
-                .map(domainEvent -> {
+                  })
+                  .map(domainEvent -> {
                     bus.publishEvent(domainEvent);
                     log.info("Wallet Funded Domain Event published");
                     return domainEvent;
-                })
-                .flatMap(repository::saveDomainEvent)
+                  })
+                  .flatMap(repository::saveDomainEvent);
+                }
         );
     }
 }
