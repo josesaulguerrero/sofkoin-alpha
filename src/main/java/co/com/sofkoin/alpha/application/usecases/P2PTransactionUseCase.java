@@ -49,7 +49,7 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
 
                                 if (
                                         !command.getBuyerId().equals(offerToDelete.targetAudienceId().value())
-                                        && !offerToDelete.targetAudienceId().value().equals("-")
+                                                && !offerToDelete.targetAudienceId().value().equals("-")
                                 ) {
                                     throw new IllegalArgumentException("You cannot commit this transaction; it is not directed to you.");
                                 }
@@ -61,8 +61,10 @@ public class P2PTransactionUseCase implements UseCase<CommitP2PTransaction> {
 
                                 DeleteP2POffer deleteP2POfferCommand =
                                         new DeleteP2POffer(market.identity().value(), offerToDelete.identity().value());
-                                return deleteP2POfferUseCase.apply(Mono.just(deleteP2POfferCommand))
-                                        .thenMany(Flux.merge(buyerFlux, sellerFlux));
+                                return Flux.merge(buyerFlux, sellerFlux)
+                                        .collectList()
+                                        .flatMapMany(events -> deleteP2POfferUseCase.apply(Mono.just(deleteP2POfferCommand))
+                                        .thenMany(Flux.fromIterable(events)));
                             });
                 });
     }
