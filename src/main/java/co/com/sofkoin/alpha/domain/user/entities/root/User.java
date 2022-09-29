@@ -103,7 +103,7 @@ public class User extends AggregateEvent<UserID> {
         Double userCryptoAmount = this.findCryptoAmountBySymbol(cryptoSymbol);
 
         if(transactionCryptoAmount > userCryptoAmount) {
-            throw new IllegalArgumentException("The user doesn't have enough crypto to sell to the exchange.");
+            throw new IllegalArgumentException("The user doesn't have enough " + cryptoSymbol + " to to make this transaction.");
         }
         if(transactionCryptoAmount < 0.000001 || transactionCryptoAmount > 100000.0 ){
             throw new IllegalArgumentException("The minimum value for a transaction is 0.0000001" +
